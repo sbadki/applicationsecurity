@@ -1,0 +1,5 @@
+example\owasptop10\VulnerableObj.class
+example\others\UnzipFile.class
+example\owasptop10\Employee.class
+example\owasptop10\InsecureDeserialization.class
+example\others\ZipUtil.class

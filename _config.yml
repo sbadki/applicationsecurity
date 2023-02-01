@@ -3,7 +3,7 @@
 permalink: /:categories/:year/:month/:day/:title
 
 
-title: Application security blogs
+title: Application Security Blogs
 email: badki_shital@yahoo.com
 description: >- # this means to ignore newlines until "baseurl:"
   Write an awesome description for your new site here. You can edit this

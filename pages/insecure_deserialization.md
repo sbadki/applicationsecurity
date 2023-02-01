@@ -40,9 +40,9 @@ able to override the readObject method of the serialized class. These methods ar
 subset of methods that you do not have to explicitly invoke. Instead, they are invoked automatically whenever a particular event or scenario
 occurs. **Magic methods** are a common feature of object-oriented programming in various languages.
 
-![employee.png](../images/employee.png)
+![employee.png](https://sbadki.github.io/applicationsecurity/images/employee.png)
 
-![result.png](../images/result.png)
+![result.png](https://sbadki.github.io/applicationsecurity/images/result.png)
 
 
 Attackers can customize deserialization protocol for example, by overriding the readObject() function of the Java Serializable class as
@@ -54,13 +54,13 @@ of Bytes, it uses reflection to re-create an object.
 If we are able to serialize this object then we can execute any command remotely.  VulnerableObj class can run any command given to it.
 Which causes any command to be executed by an application.
 
-![Vulnerable.png](../images/Vulnerable.png)
+![vulnerable.png](https://sbadki.github.io/applicationsecurity/images/vulnerable.png)
 
 If we pass calc.exe as command, it runs while deserializing VulnerableObj. We could see that the ClassCastException has occurred but the
 command we sent is executed that means the harm is already done. This is just sample example to show that we can execute any command by
 passing a vulnerable object. In reality attacker might harm to the system severely by exploiting this kind of vulnerability.
 
-![rce.png](../images/rce.png)
+![rce.png](https://sbadki.github.io/applicationsecurity/images/rce.png)
 
 ## Prevention:
 

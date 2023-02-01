@@ -21,7 +21,7 @@ or network socket into an object.
 There are different libraries or classes for different languages for serialization/deserialization purposes such as in Python - Pickle,
 PHP - Serialize/Unserialize, Java - ObjectInputStream/ObjectOutputStream and in Javascript - JSON.stringfy()/JSON.parse()
 
-![serialization.png](../images/serialization.png)
+![serialization.png](https://sbadki.github.io/applicationsecurity/images/serialization.png)
 
 
 Many programming languages support the serialization and deserialization of objects, including Java, PHP, Python, and Ruby. It’s important

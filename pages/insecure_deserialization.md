@@ -73,4 +73,6 @@ passing a vulnerable object. In reality attacker might harm to the system severe
 - Using a firewall which can help detect insecure deserialization.
 - Logging exceptions and failures encountered during deserialization
 
+Github repo: https://github.com/sbadki/applicationsecurity/tree/main
+
 ---

@@ -1,7 +1,6 @@
 ---
-layout: page
-description: Personal blogs on application security. 
----
+# Feel free to add content and custom Front Matter to this file.
+# To modify the layout, see https://jekyllrb.com/docs/themes/#overriding-theme-defaults
 
-- [Insecure Deserialization](pages/insecure_deserialization.html)
-- [ratelimiting](pages/ratelimiting.html)
+layout: home
+---

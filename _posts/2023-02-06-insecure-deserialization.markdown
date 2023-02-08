@@ -81,7 +81,9 @@ We could see all these java libraries has gadget chains and if any of these libr
 **Usage:** java -jar ysoserial.jar [payload] '[command]'
 
 The command will create a payload.ser file which will then try to deserialize it with our test class.
+
 java.exe -jar ysoserial-all.jar CommonsCollections4 'calc.exe' > payload.ser
+
 Test class to run the gadget chain
 
 ![GadgetChainTest](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgettest.png "GadgetChainTest")
@@ -104,9 +106,10 @@ We got an error but the arbitrary command 'calc.exe' is executed already, likewi
 
 	• Sanitize user inputs which helps in reduce attack surface of an application. Attackers are able to use objects like cookies to insert malicious information to change user roles. In some cases, they are able to elevate their privileges to administrator rights by using a pre-existing or cached password hash from a previous session to launch DDOS, remote execution attacks.
 
+
 **Note: Follow OWASP Insecure Deserialization Cheat Sheet for more details.**
 
 
-Github repo: https://github.com/sbadki/applicationsecurity/tree/main
+**Github repo: https://github.com/sbadki/applicationsecurity/tree/main**
 
 ---

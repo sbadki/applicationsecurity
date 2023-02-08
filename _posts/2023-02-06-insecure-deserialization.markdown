@@ -14,7 +14,7 @@ categories: Application security blogs
 **Deserialization** on the other hand, is the opposite of serialization, that is, transforming serialized data coming from a file, stream or network socket into an object.
 There are different libraries or classes for different languages for serialization/deserialization purposes such as in Python - Pickle, PHP - Serialize/Unserialize, Java - ObjectInputStream/ObjectOutputStream and in Javascript - JSON.stringfy()/JSON.parse()
 
-![serialization](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/serialization.png "serialization")
+![serialization](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/serialization.png "serialization")
 Courtesy: Portswigger.net
 
 Many programming languages support the serialization and deserialization of objects, including Java, PHP, Python, and Ruby. It’s important to understand that safe deserialization of objects is normal practice in software development. The trouble however, starts when deserializing untrusted user input
@@ -28,18 +28,18 @@ Many programming languages support the serialization and deserialization of obje
 We serialized an Employee object and deserialized it as shown below but how come the name is de-serialised as Jacob!? This is because we are able to override the readObject method of the serialized class.
 
 
-![JavaExample](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/employee.png "JavaExample")
+![JavaExample](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/employee.png "JavaExample")
 
 
 Hex dump of the serialized employee object shown as below. The email id is referring to Jacob@example.com.
 
 
-![HexDump](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/hex_dump.png "HexDump")
+![HexDump](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/hex_dump.png "HexDump")
 
 
 After deserialization the email id is updated to attacker@example.com.
 
-![Result](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/result.png "Result")
+![Result](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/result.png "Result")
 
 
 How does this has happened? how does Serialized object is being modified on the fly during Deserialization. This is because Deserialization doesn’t call constructure while re-creating an object from Stream of Bytes, it uses reflection to re-create an object. All the magic is happened because of readObject method overridden in Employee class. These methods are also called as magic methods. Magic methods are a special subset of methods that you do not have to explicitly invoke. Instead, they are invoked automatically whenever a particular event or scenario occurs. Magic methods are a common feature of object-oriented programming in various languages like Ruby, PHP, python, Java etc.
@@ -49,13 +49,13 @@ So, this concludes that the Serialized objects are not secured.
 Attackers can customize deserialization protocol for example, by overriding the readObject() function of the Java Serializable class as shown in below snippet to achieve remote code execution.
 
 
-![VulnerableObject](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/Vulnerable.png "VulnerableObject")
+![VulnerableObject](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/Vulnerable.png "VulnerableObject")
 
 
 We are passing a simple command i.e. calc.exec to see the effect. We see that the ClassCastException has occurred while casting a VulnerableObj to Employee object also, the calc.exe also executed. This means any command passed to VulnerableObj will get executed during deserialization of an object. This is just a sample example to show how deserialization can make harm to the system. In reality attacker might do many harm to the system by exploiting this vulnerability.
 
 
-![SerializedVulnerableObject](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/serial_vulobj.png "SerializedVulnerableObject")
+![SerializedVulnerableObject](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/serial_vulobj.png "SerializedVulnerableObject")
 
 
 ## Gadgets and Chains : ##
@@ -64,7 +64,7 @@ A gadget—as used by Lawrence & Frohoff in their talk Marschalling Pickle at Ap
 The exploitation strategy is to start with a “kick-off” gadget that’s executed after deserialization and build a chain of instances and method invocations to get to a “sink” gadget that’s able to execute arbitrary code or commands. Once attackers manage to get input to a sink gadget, they can do the maximum damage by performing an arbitrary code execution.
 
 
-![GadgetChain](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgetchain.png "GadgetChain")
+![GadgetChain](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/gadgetchain.png "GadgetChain")
 Courtesy: https://brandur.org/fragments/gadgets-and-chains
 
 Attacker needs access to the source code to identify such Gadgets and it’s a tedious task to do it manually. Fortunately, There are tools like **"ysoserial"** and **"gadget insepctor"** which helps us to identify suc Gadgets.
@@ -75,7 +75,7 @@ Attacker needs access to the source code to identify such Gadgets and it’s a t
 
 We could see all these java libraries has gadget chains and if any of these library is happen to found in our applications classpath our application is vulnerable to Insecure deserialization vulnerability. So, today will take an example of commons-collections library and try to run arbitrary command.
 
-![YSoserial](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/ysoserial.png "YSoserial")
+![YSoserial](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/ysoserial.png "YSoserial")
 
 
 **Usage:** java -jar ysoserial.jar [payload] '[command]'
@@ -86,12 +86,12 @@ java.exe -jar ysoserial-all.jar CommonsCollections4 'calc.exe' > payload.ser
 
 Test class to run the gadget chain
 
-![GadgetChainTest](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgettest.png "GadgetChainTest")
+![GadgetChainTest](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/gadgettest.png "GadgetChainTest")
 
 
 We got an error but the arbitrary command 'calc.exe' is executed already, likewise an attacker can run any arbitrary code and can cause damage to the system.
 
-![GadgetChainResult](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgetresult.png "GadgetChainResult")
+![GadgetChainResult](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/gadgetresult.png "GadgetChainResult")
 
 
 ## Mitigation: ##
@@ -101,7 +101,7 @@ We got an error but the arbitrary command 'calc.exe' is executed already, likewi
 	• If can't avoid and we are forced to implement Serialization due to their hierarchy. We can override deserialize method by throwing an exception. 
 
 
-![Overiride](https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/override.png "Overiride")
+![Overiride](https://sbadki.github.io/appsec/assets/images/insecure-deserialization/override.png "Overiride")
 
 
 	• Sanitize user inputs which helps in reduce attack surface of an application. Attackers are able to use objects like cookies to insert malicious information to change user roles. In some cases, they are able to elevate their privileges to administrator rights by using a pre-existing or cached password hash from a previous session to launch DDOS, remote execution attacks.
@@ -110,6 +110,6 @@ We got an error but the arbitrary command 'calc.exe' is executed already, likewi
 **Note: Follow OWASP Insecure Deserialization Cheat Sheet for more details.**
 
 
-**Github repo: https://github.com/sbadki/applicationsecurity/tree/main**
+**Github repo: https://github.com/sbadki/appsec/tree/main**
 
 ---

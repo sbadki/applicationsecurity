@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Insecure Deserialization"
-date:   2023-01-30 12:28:45 +0800
+#date:   2023-01-30 12:28:45 +0800
 categories: Application security blogs
 ---
 

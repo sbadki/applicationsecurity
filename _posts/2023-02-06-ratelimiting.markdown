@@ -1,5 +1,5 @@
 ---
-layout: page
+layout: post
 title: Rate Limiting API endpoints with Bucket4j
 date:   2023-01-31 01:23:45 +0800
 description: Token-Buket rate limiting algorithm Implementation

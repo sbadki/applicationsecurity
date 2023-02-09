@@ -1,7 +1,19 @@
+title : Application Security Blogs
+author :
+  name : Shital Rasekar
+  email : badki_shital@yahoo.com
+  github : sbadki
+
+production_url : http://sbadki.github.io/applicationsecurity
+BASE_PATH : http://sbadki.github.io/applicationsecurity
+
+markdown: kramdown
+
 plugins:
   - jekyll-feed
   - jekyll-sitemap
   - jekyll-seo-tag
   - webrick
   - faraday-retry
+  -
 github: [metadata]

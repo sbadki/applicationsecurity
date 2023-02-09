@@ -4,4 +4,4 @@ title: About
 permalink: /about/
 ---
 
-Here I'll be posting blogs on application security for my studies. 
+Application security blogs for reference purpose. 

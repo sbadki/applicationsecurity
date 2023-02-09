@@ -1,0 +1,15 @@
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    {%- seo -%}
+    <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
+    {%- feed_meta -%}
+    {%- if jekyll.environment == 'production' %}
+        <script async defer data-website-id="6ba547fe-d070-4339-b12f-0a3b3c9f0847" src="https://sdosda-umami.herokuapp.com/umami.js"></script>
+    {% endif %}
+
+    <!-- Simple Markdown Editor -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+</head>

@@ -1,7 +1,7 @@
 ---
-layout: page
+layout: post
 title: Rate Limiting API endpoints with Bucket4j
-#date:   2023-01-31 01:23:45 +0800
+date:   2023-01-31 01:23:45 +0800
 description: Token-Buket rate limiting algorithm Implementation
 ---
 
@@ -65,7 +65,7 @@ each bandwidth. By default, an initial amount of tokens equals to capacity and c
 
 It’s a simple Spring boot application which has UserController with three endpoints createUser, getUser and get all users. 
 Rate limit is applied to all three endpoints and will see it in action.  The code can be referred from the 
-Github repo: https://github.com/sbadki/applicationsecurity/tree/main
+Github repo: https://github.com/sbadki/appsec/tree/main
 
 We are using Bucket4J, it's a java library to implement the rate limiting which is based of token-bucket algorithm.
 Provide following dependency with other required dependencies for spring boot rest API.
@@ -79,20 +79,20 @@ tokens will be carry forward to next minute in addition to 8 new tokens to full-
 If we receive 10 requests in first 45 seconds itself, then we would need to wait another 15 seconds to serve the requests.
  
 
-![dependency.JPG](https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/dependency.JPG)
+![dependency.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/dependency.JPG)
 
 
 The Bucket is built with rate limit of 10 requests per minute, So the API will reject the requests if its already received 
 10 requests in a time frame of 1 minute.
 
-![bucket_greedy.JPG](https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/bucket_greedy.JPG)
+![bucket_greedy.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/bucket_greedy.JPG)
 
 
 But what if all the 10 requests came in first 5 seconds which consumed all the tokens leads to spike in the application
 suddenly.We can control this limit by applying multiple limits to the bucket. The bucket would serve 10 requests per 
 minute but serve 5 requests in 20 seconds time window.
 
-![bucket_inter.JPG](https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/bucket_inter.JPG)
+![bucket_inter.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/bucket_inter.JPG)
 
 
 ## Implementation:
@@ -100,7 +100,7 @@ minute but serve 5 requests in 20 seconds time window.
 tryConsume will Tries to consume specified number of tokens from the bucket during the specified timeframe.
 When it exceeds rate limit then it will reject the request with status code as HTTP - 429 TooManyRequests. 
 
-![api_ratelimits.JPG](https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/api_ratelimits.JPG)
+![api_ratelimits.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/api_ratelimits.JPG)
 
 
 ## Result:
@@ -108,5 +108,5 @@ When it exceeds rate limit then it will reject the request with status code as H
 All the requests after 5 seconds got rejected.
 
 
-![result.JPG](https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/result.JPG)
+![result.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/result.JPG)
 

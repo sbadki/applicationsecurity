@@ -194,3 +194,13 @@ table td { border: 1px solid #e8e8e8; }
 .highlight .vg { color: #008080; }
 .highlight .vi { color: #008080; }
 .highlight .il { color: #099; }
+
+.site-title { color: #E75480; }
+.site-title:visited { color: #E75480; }
+
+.featured-image { margin-bottom: 50px; }
+.featured-image img { width: 100%; max-height: 250px; object-fit: cover; }
+
+.post-list > li { display: flex; flex-wrap: wrap-reverse; }
+.post-list > li div:first-child { flex: 4 0 200px; }
+.post-list > li .featured-image { flex: 1 0 200px; margin-bottom: 0; }

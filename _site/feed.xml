@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2023-02-09T10:27:57+08:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">Application Security Blogs</title><subtitle>Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search results) and in your feed.xml site description.</subtitle><entry><title type="html">Rate Limiting API endpoints with Bucket4j</title><link href="http://localhost:4000/2023/02/06/ratelimiting.html" rel="alternate" type="text/html" title="Rate Limiting API endpoints with Bucket4j" /><published>2023-02-06T00:00:00+08:00</published><updated>2023-02-06T00:00:00+08:00</updated><id>http://localhost:4000/2023/02/06/ratelimiting</id><content type="html" xml:base="http://localhost:4000/2023/02/06/ratelimiting.html">&lt;h2 id=&quot;rate-limiting&quot;&gt;Rate Limiting&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.3">Jekyll</generator><link href="http://localhost:4000/applicationsecurity/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/applicationsecurity/" rel="alternate" type="text/html" /><updated>2023-02-09T20:03:33+08:00</updated><id>http://localhost:4000/applicationsecurity/feed.xml</id><title type="html">Application Security Blog</title><subtitle>This project is a showcase of how to setup a portfolio website using GitHub Pages,  with the main accent put on the blogging part.</subtitle><entry><title type="html">Rate Limiting API endpoints with Bucket4j</title><link href="http://localhost:4000/applicationsecurity/posts/2023-01-31-ratelimiting.html" rel="alternate" type="text/html" title="Rate Limiting API endpoints with Bucket4j" /><published>2023-01-31T01:23:45+08:00</published><updated>2023-01-31T01:23:45+08:00</updated><id>http://localhost:4000/applicationsecurity/posts/ratelimiting</id><content type="html" xml:base="http://localhost:4000/applicationsecurity/posts/2023-01-31-ratelimiting.html">&lt;h2 id=&quot;rate-limiting&quot;&gt;Rate Limiting&lt;/h2&gt;
 
 &lt;p&gt;&lt;strong&gt;Rate limiting&lt;/strong&gt; is a strategy for limiting network traffic. It restricts client for making number of API calls within 
 a certain time frame. This is required to prevent Brute force, DoS or DDos, web scraping attacks.&lt;/p&gt;
@@ -61,7 +61,7 @@ each bandwidth. By default, an initial amount of tokens equals to capacity and c
 
 &lt;p&gt;It’s a simple Spring boot application which has UserController with three endpoints createUser, getUser and get all users. 
 Rate limit is applied to all three endpoints and will see it in action.  The code can be referred from the 
-Github repo: https://github.com/sbadki/applicationsecurity/tree/main&lt;/p&gt;
+Github repo: https://github.com/sbadki/appsec/tree/main&lt;/p&gt;
 
 &lt;p&gt;We are using Bucket4J, it’s a java library to implement the rate limiting which is based of token-bucket algorithm.
 Provide following dependency with other required dependencies for spring boot rest API.&lt;/p&gt;
@@ -74,31 +74,31 @@ tokens will be carry forward to next minute in addition to 8 new tokens to full-
 
 &lt;p&gt;If we receive 10 requests in first 45 seconds itself, then we would need to wait another 15 seconds to serve the requests.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/dependency.JPG&quot; alt=&quot;dependency.JPG&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/appsec/assets/images/ratelimit/dependency.JPG&quot; alt=&quot;dependency.JPG&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The Bucket is built with rate limit of 10 requests per minute, So the API will reject the requests if its already received 
 10 requests in a time frame of 1 minute.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/bucket_greedy.JPG&quot; alt=&quot;bucket_greedy.JPG&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/appsec/assets/images/ratelimit/bucket_greedy.JPG&quot; alt=&quot;bucket_greedy.JPG&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;But what if all the 10 requests came in first 5 seconds which consumed all the tokens leads to spike in the application
 suddenly.We can control this limit by applying multiple limits to the bucket. The bucket would serve 10 requests per 
 minute but serve 5 requests in 20 seconds time window.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/bucket_inter.JPG&quot; alt=&quot;bucket_inter.JPG&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/appsec/assets/images/ratelimit/bucket_inter.JPG&quot; alt=&quot;bucket_inter.JPG&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;implementation&quot;&gt;Implementation:&lt;/h2&gt;
 
 &lt;p&gt;tryConsume will Tries to consume specified number of tokens from the bucket during the specified timeframe.
 When it exceeds rate limit then it will reject the request with status code as HTTP - 429 TooManyRequests.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/api_ratelimits.JPG&quot; alt=&quot;api_ratelimits.JPG&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/appsec/assets/images/ratelimit/api_ratelimits.JPG&quot; alt=&quot;api_ratelimits.JPG&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;result&quot;&gt;Result:&lt;/h2&gt;
 
 &lt;p&gt;All the requests after 5 seconds got rejected.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/ratelimit/result.JPG&quot; alt=&quot;result.JPG&quot; /&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">Rate Limiting</summary></entry><entry><title type="html">Insecure Deserialization</title><link href="http://localhost:4000/application/security/blogs/2023/02/06/insecure-deserialization.html" rel="alternate" type="text/html" title="Insecure Deserialization" /><published>2023-02-06T00:00:00+08:00</published><updated>2023-02-06T00:00:00+08:00</updated><id>http://localhost:4000/application/security/blogs/2023/02/06/insecure-deserialization</id><content type="html" xml:base="http://localhost:4000/application/security/blogs/2023/02/06/insecure-deserialization.html">&lt;p&gt;&lt;strong&gt;Insecure deserialization&lt;/strong&gt; is one of the top vulnerability in OWASP top 10 list for 2021. Insecure Deserialization is a vulnerability which occurs when untrusted data is used to abuse the logic of an application. Successful insecure deserialization attacks could allow an attacker to carry out denial-of-service (DoS) attacks, authentication bypasses and remote code execution attacks.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/appsec/assets/images/ratelimit/result.JPG&quot; alt=&quot;result.JPG&quot; /&gt;&lt;/p&gt;</content><author><name></name></author><summary type="html">Rate Limiting</summary></entry><entry><title type="html">Insecure Deserialization</title><link href="http://localhost:4000/applicationsecurity/posts/2023-01-30-insecure-deserialization.html" rel="alternate" type="text/html" title="Insecure Deserialization" /><published>2023-01-30T12:28:45+08:00</published><updated>2023-01-30T12:28:45+08:00</updated><id>http://localhost:4000/applicationsecurity/posts/insecure-deserialization</id><content type="html" xml:base="http://localhost:4000/applicationsecurity/posts/2023-01-30-insecure-deserialization.html">&lt;p&gt;&lt;strong&gt;Insecure deserialization&lt;/strong&gt; is one of the top vulnerability in OWASP top 10 list for 2021. Insecure Deserialization is a vulnerability which occurs when untrusted data is used to abuse the logic of an application. Successful insecure deserialization attacks could allow an attacker to carry out denial-of-service (DoS) attacks, authentication bypasses and remote code execution attacks.&lt;/p&gt;
 
 &lt;h2 id=&quot;serialization--deserialization&quot;&gt;Serialization &amp;amp; Deserialization:&lt;/h2&gt;
 
@@ -107,8 +107,8 @@ When it exceeds rate limit then it will reject the request with status code as H
 &lt;p&gt;&lt;strong&gt;Deserialization&lt;/strong&gt; on the other hand, is the opposite of serialization, that is, transforming serialized data coming from a file, stream or network socket into an object.
 There are different libraries or classes for different languages for serialization/deserialization purposes such as in Python - Pickle, PHP - Serialize/Unserialize, Java - ObjectInputStream/ObjectOutputStream and in Javascript - JSON.stringfy()/JSON.parse()&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/serialization.png&quot; alt=&quot;serialization&quot; title=&quot;serialization&quot; /&gt;
-Courtesy: Portswigger.net&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/applicationsecurity/assets/images/insecure-deserialization/serialization.png&quot; alt=&quot;my inspiring image&quot; /&gt;
+_Photo by: [Portswigger.net]&lt;/p&gt;
 
 &lt;p&gt;Many programming languages support the serialization and deserialization of objects, including Java, PHP, Python, and Ruby. It’s important to understand that safe deserialization of objects is normal practice in software development. The trouble however, starts when deserializing untrusted user input&lt;/p&gt;
 
@@ -119,15 +119,15 @@ Courtesy: Portswigger.net&lt;/p&gt;
 &lt;p&gt;&lt;strong&gt;Java example:&lt;/strong&gt;
 We serialized an Employee object and deserialized it as shown below but how come the name is de-serialised as Jacob!? This is because we are able to override the readObject method of the serialized class.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/employee.png&quot; alt=&quot;JavaExample&quot; title=&quot;JavaExample&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/applicationsecurity/assets/images/insecure-deserialization/employee.png&quot; alt=&quot;JavaExample&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;Hex dump of the serialized employee object shown as below. The email id is referring to Jacob@example.com.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/hex_dump.png&quot; alt=&quot;HexDump&quot; title=&quot;HexDump&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/hex_dump.png&quot; alt=&quot;HexDump&quot; title=&quot;HexDump&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;After deserialization the email id is updated to attacker@example.com.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/result.png&quot; alt=&quot;Result&quot; title=&quot;Result&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/result.png&quot; alt=&quot;Result&quot; title=&quot;Result&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;How does this has happened? how does Serialized object is being modified on the fly during Deserialization. This is because Deserialization doesn’t call constructure while re-creating an object from Stream of Bytes, it uses reflection to re-create an object. All the magic is happened because of readObject method overridden in Employee class. These methods are also called as magic methods. Magic methods are a special subset of methods that you do not have to explicitly invoke. Instead, they are invoked automatically whenever a particular event or scenario occurs. Magic methods are a common feature of object-oriented programming in various languages like Ruby, PHP, python, Java etc.&lt;/p&gt;
 
@@ -135,18 +135,18 @@ We serialized an Employee object and deserialized it as shown below but how come
 
 &lt;p&gt;Attackers can customize deserialization protocol for example, by overriding the readObject() function of the Java Serializable class as shown in below snippet to achieve remote code execution.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/Vulnerable.png&quot; alt=&quot;VulnerableObject&quot; title=&quot;VulnerableObject&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/Vulnerable.png&quot; alt=&quot;VulnerableObject&quot; title=&quot;VulnerableObject&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We are passing a simple command i.e. calc.exec to see the effect. We see that the ClassCastException has occurred while casting a VulnerableObj to Employee object also, the calc.exe also executed. This means any command passed to VulnerableObj will get executed during deserialization of an object. This is just a sample example to show how deserialization can make harm to the system. In reality attacker might do many harm to the system by exploiting this vulnerability.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/serial_vulobj.png&quot; alt=&quot;SerializedVulnerableObject&quot; title=&quot;SerializedVulnerableObject&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/serial_vulobj.png&quot; alt=&quot;SerializedVulnerableObject&quot; title=&quot;SerializedVulnerableObject&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;gadgets-and-chains-&quot;&gt;Gadgets and Chains :&lt;/h2&gt;
 
 &lt;p&gt;A gadget—as used by Lawrence &amp;amp; Frohoff in their talk Marschalling Pickle at AppSecCali 2015—is a class or function that exists in the application which helps attacker to achieve a particular goal but a gadget may not by itself do anything harmful with user input.
 The exploitation strategy is to start with a “kick-off” gadget that’s executed after deserialization and build a chain of instances and method invocations to get to a “sink” gadget that’s able to execute arbitrary code or commands. Once attackers manage to get input to a sink gadget, they can do the maximum damage by performing an arbitrary code execution.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgetchain.png&quot; alt=&quot;GadgetChain&quot; title=&quot;GadgetChain&quot; /&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/gadgetchain.png&quot; alt=&quot;GadgetChain&quot; title=&quot;GadgetChain&quot; /&gt;
 Courtesy: https://brandur.org/fragments/gadgets-and-chains&lt;/p&gt;
 
 &lt;p&gt;Attacker needs access to the source code to identify such Gadgets and it’s a tedious task to do it manually. Fortunately, There are tools like &lt;strong&gt;“ysoserial”&lt;/strong&gt; and &lt;strong&gt;“gadget insepctor”&lt;/strong&gt; which helps us to identify suc Gadgets.&lt;/p&gt;
@@ -157,7 +157,7 @@ Courtesy: https://brandur.org/fragments/gadgets-and-chains&lt;/p&gt;
 
 &lt;p&gt;We could see all these java libraries has gadget chains and if any of these library is happen to found in our applications classpath our application is vulnerable to Insecure deserialization vulnerability. So, today will take an example of commons-collections library and try to run arbitrary command.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/ysoserial.png&quot; alt=&quot;YSoserial&quot; title=&quot;YSoserial&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/ysoserial.png&quot; alt=&quot;YSoserial&quot; title=&quot;YSoserial&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Usage:&lt;/strong&gt; java -jar ysoserial.jar [payload] ‘[command]’&lt;/p&gt;
 
@@ -167,11 +167,11 @@ Courtesy: https://brandur.org/fragments/gadgets-and-chains&lt;/p&gt;
 
 &lt;p&gt;Test class to run the gadget chain&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgettest.png&quot; alt=&quot;GadgetChainTest&quot; title=&quot;GadgetChainTest&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/gadgettest.png&quot; alt=&quot;GadgetChainTest&quot; title=&quot;GadgetChainTest&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;We got an error but the arbitrary command ‘calc.exe’ is executed already, likewise an attacker can run any arbitrary code and can cause damage to the system.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/gadgetresult.png&quot; alt=&quot;GadgetChainResult&quot; title=&quot;GadgetChainResult&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/gadgetresult.png&quot; alt=&quot;GadgetChainResult&quot; title=&quot;GadgetChainResult&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;mitigation&quot;&gt;Mitigation:&lt;/h2&gt;
 
@@ -180,7 +180,7 @@ Courtesy: https://brandur.org/fragments/gadgets-and-chains&lt;/p&gt;
 • If can&apos;t avoid and we are forced to implement Serialization due to their hierarchy. We can override deserialize method by throwing an exception. 
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/img/insecure-deserialization/override.png&quot; alt=&quot;Overiride&quot; title=&quot;Overiride&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;https://sbadki.github.io/applicationsecurity/assets/images/insecure-deserialization/override.png&quot; alt=&quot;Overiride&quot; title=&quot;Overiride&quot; /&gt;&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;• Sanitize user inputs which helps in reduce attack surface of an application. Attackers are able to use objects like cookies to insert malicious information to change user roles. In some cases, they are able to elevate their privileges to administrator rights by using a pre-existing or cached password hash from a previous session to launch DDOS, remote execution attacks.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -189,4 +189,20 @@ Courtesy: https://brandur.org/fragments/gadgets-and-chains&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Github repo: https://github.com/sbadki/applicationsecurity/tree/main&lt;/strong&gt;&lt;/p&gt;
 
-&lt;hr /&gt;</content><author><name></name></author><category term="Application" /><category term="security" /><category term="blogs" /><summary type="html">Insecure deserialization is one of the top vulnerability in OWASP top 10 list for 2021. Insecure Deserialization is a vulnerability which occurs when untrusted data is used to abuse the logic of an application. Successful insecure deserialization attacks could allow an attacker to carry out denial-of-service (DoS) attacks, authentication bypasses and remote code execution attacks.</summary></entry></feed>
+&lt;hr /&gt;</content><author><name></name></author><category term="Application" /><category term="security" /><category term="blogs" /><summary type="html">Insecure deserialization is one of the top vulnerability in OWASP top 10 list for 2021. Insecure Deserialization is a vulnerability which occurs when untrusted data is used to abuse the logic of an application. Successful insecure deserialization attacks could allow an attacker to carry out denial-of-service (DoS) attacks, authentication bypasses and remote code execution attacks.</summary></entry><entry><title type="html">Welcome to Jekyll!</title><link href="http://localhost:4000/applicationsecurity/posts/2022-02-10-welcome-to-jekyll.html" rel="alternate" type="text/html" title="Welcome to Jekyll!" /><published>2022-02-10T01:03:13+08:00</published><updated>2022-02-10T01:03:13+08:00</updated><id>http://localhost:4000/applicationsecurity/posts/welcome-to-jekyll</id><content type="html" xml:base="http://localhost:4000/applicationsecurity/posts/2022-02-10-welcome-to-jekyll.html">&lt;p&gt;You’ll find this post in your &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;_posts&lt;/code&gt; directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;, which launches a web server and auto-regenerates your site when a file is updated.&lt;/p&gt;
+
+&lt;p&gt;Jekyll requires blog post files to be named according to the following format:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;YEAR-MONTH-DAY-title.MARKUP&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Where &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;YEAR&lt;/code&gt; is a four-digit number, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MONTH&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DAY&lt;/code&gt; are both two-digit numbers, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;MARKUP&lt;/code&gt; is the file extension representing the format used in the file. After that, include the necessary front matter. Take a look at the source for this post to get an idea about how it works.&lt;/p&gt;
+
+&lt;p&gt;Jekyll also offers powerful support for code snippets:&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-ruby&quot; data-lang=&quot;ruby&quot;&gt;&lt;span class=&quot;k&quot;&gt;def&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+  &lt;span class=&quot;nb&quot;&gt;puts&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;Hi, &lt;/span&gt;&lt;span class=&quot;si&quot;&gt;#{&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;k&quot;&gt;end&lt;/span&gt;
+&lt;span class=&quot;n&quot;&gt;print_hi&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&apos;Tom&apos;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;c1&quot;&gt;#=&amp;gt; prints &apos;Hi, Tom&apos; to STDOUT.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;Check out the &lt;a href=&quot;https://jekyllrb.com/docs/home&quot;&gt;Jekyll docs&lt;/a&gt; for more info on how to get the most out of Jekyll. File all bugs/feature requests at &lt;a href=&quot;https://github.com/jekyll/jekyll&quot;&gt;Jekyll’s GitHub repo&lt;/a&gt;. If you have questions, you can ask them on &lt;a href=&quot;https://talk.jekyllrb.com/&quot;&gt;Jekyll Talk&lt;/a&gt;.&lt;/p&gt;</content><author><name></name></author><category term="jekyll" /><category term="update" /><summary type="html">You’ll find this post in your _posts directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run jekyll serve, which launches a web server and auto-regenerates your site when a file is updated.</summary></entry></feed>

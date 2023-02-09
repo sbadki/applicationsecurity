@@ -4,3 +4,4 @@ plugins:
   - jekyll-seo-tag
   - webrick
   - faraday-retry
+github: [metadata]

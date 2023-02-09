@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 source "https://rubygems.org"
 
+production_url : http://sbadki.github.io/applicationsecurity
+BASE_PATH : http://sbadki.github.io/applicationsecurity
 #gem "jekyll"
 gem "github-pages", group: :jekyll_plugins
 group :jekyll_plugins do

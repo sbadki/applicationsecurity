@@ -1,33 +1,43 @@
 package com.example.owasptop10;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class InsecureDeserialization {
 
+    static Set<String> whitelist = new HashSet<>(Arrays.asList("Employee"));
+
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
-        System.out.println("Serialize and deserialization of an employee object");
         Employee employee = new Employee("Jacob", "Jacob@example.com", "11 Street, USA");
         serializeObject(employee,"employee.ser");
+        System.out.println("Deserializing an Employee object." );
         deserializeObject("employee.ser");
 
-        VulnerableObj vulnerableObj = new VulnerableObj("calc.exe");
+        System.out.println("---------------------------------------------------------------------");
 
+        VulnerableObj vulnerableObj = new VulnerableObj("calc.exe");
         serializeObject(vulnerableObj, "vulnerable.ser");
+        System.out.println("Deserializing a Vulnerable object." );
         deserializeObject("vulnerable.ser");
     }
 
-    private static Employee deserializeObject(String fileName) throws IOException, ClassNotFoundException {
+    public static Employee deserializeObject(String fileName) throws IOException, ClassNotFoundException {
         Employee employee;
         try(FileInputStream fis = new FileInputStream(fileName);
             ObjectInputStream ois = new ObjectInputStream(fis)) {
+            //Prevention 2: Whitelist approach
+            //ObjectInputStream ois = new LookAheadObjectInputStream(fis,whitelist)) {
             employee = (Employee) ois.readObject();
             System.out.println(employee);
         }
         return employee;
     }
 
-    private static void serializeObject(Object obj, String fileName) throws IOException {
+    public static void serializeObject(Object obj, String fileName) throws IOException {
+        System.out.println("Serializing a " +obj.getClass().getName());
         try(FileOutputStream fos = new FileOutputStream(fileName);
             ObjectOutputStream oos = new ObjectOutputStream(fos))  {
             oos.writeObject(obj);
@@ -49,9 +59,10 @@ class Employee implements Serializable {
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
         in.defaultReadObject();
-        this.email = "attacker" + this.email;
     }
 
+    //Prevention - 1
+    //We can override deserialize method by throwing an exception.
 //    private final void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
 //      throw new IOException(("Can't be deserialized");
 //    }
@@ -66,8 +77,9 @@ class Employee implements Serializable {
         return sb.toString();
     }
 }
+
 class VulnerableObj implements Serializable {
-    private String command;
+    public String command;
 
     public VulnerableObj(String command) {
         this.command = command;

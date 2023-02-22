@@ -21,8 +21,7 @@
 title: Application Security Blog
 email: badki_shital@yahoo.com
 description: >- # this means to ignore newlines until "baseurl:"
-  This project is a showcase of how to setup a portfolio website using GitHub Pages, 
-  with the main accent put on the blogging part.
+  Blog posts on Application security using GitHub Pages.
 baseurl: '/applicationsecurity' # the subpath of your site, e.g. /blog
 url: 'https://sbadki.github.io' # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb

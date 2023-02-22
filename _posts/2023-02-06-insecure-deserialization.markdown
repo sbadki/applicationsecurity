@@ -27,17 +27,24 @@ Many programming languages support the serialization and deserialization of obje
 ## What is In-Secure deserialization? ##
 
 **Insecure deserialization** is a type of vulnerability that arises when an attacker can manipulate the serialized object and pass harmful data into the application code which cause unintended consequences in the program’s flow.
-Java example: We serialized an Employee object by implementing Serializable interface.
+
+Example: We serialized an Employee object by implementing Serializable interface.
+
 
 ![JavaExample]({{ "/assets/images/insecure-deserialization/employee.png" | relative_url }})
 
+
 Hex dump of the serialized employee object
+
 
 ![HexDump]({{ "/assets/images/insecure-deserialization/hexdump.png" | relative_url }})
 
+
 Here we serialized Vulnerable Object and deserialized it, so whatever command we have passed to Vulnerable Object got executed.
 
-![vulnerableObject]({{ "/assets/images/insecure-deserialization/vulnerable.png" | relative_url }})
+
+![vulnerable]({{ "/assets/images/insecure-deserialization/vulnerable.png" | relative_url }})
+
 
 The point to make here is that, while deserialization the application is not verifying whether the input for deserialization is the one which we expect to deserialize? It's just deserializing whatever is being passed. With Vulnerable object we passed the command as calc.exe and it's just executed. What if the hacker pass some arbitrary code which may give a remote access to the hacker. Certainty its possible. That's why it's called as insecure deserialization.
 
@@ -53,44 +60,59 @@ So, this concludes that the De-Serialization is not secured. Attackers can custo
 We take an example from Webgoat. It’s the deliberately insecure java-based application. Which has OWASP top 10 challenges.
 e.g. "Try to change this serialized object in order to delay the page response for exactly 5 seconds."
 
+
 ![webgoateg]({{ "/assets/images/insecure-deserialization/webgoateg.png" | relative_url }})
 
-1.	We need to know whether there is any object which is getting serialized and deserialized. From the page it looks like it does as the string shown is starting with r00.
-2.	Intercept the request in Burp Suite and see what’s getting pass in input field. Token=deserialize.
+
+1. We need to know whether there is any object which is getting serialized and deserialized. From the page it looks like it does as the string shown is starting with r00.
+2. Intercept the request in Burp Suite and see what’s getting pass in input field. Token=deserialize.
+
 
 ![inspect]({{ "/assets/images/insecure-deserialization/inspect.png" | relative_url }})
 
-3.	Search for any magic methods like read Object() of ObjectInputStream. It's used by InsecureDeserializationTask. Its taking a token value from an input field directly without sanitizing it and deserializing it.
-4.	VulnerableTaskHolder Object is serializable object which is overriding readObject method which is executing command via.
+
+3. Search for any magic methods like read Object() of ObjectInputStream. It's used by InsecureDeserializationTask. Its taking a token value from an input field directly without sanitizing it and deserializing it.
+4. VulnerableTaskHolder Object is serializable object which is overriding readObject method which is executing command via.
       Process p = Runtime.getRuntime().exec(taskAction);
       taskAction is any string passed to its constructor. That means we can make use of this class to pass any command as string and serialized that object to execute remote code execution.
-5.	Create a test class which is serializing a VulnerableTaskHolder object by passing the taskName and taskAction as “TASK” and “Sleep 5” respectively which will delay the response of the page by 5 seconds.
+5. Create a test class which is serializing a VulnerableTaskHolder object by passing the taskName and taskAction as “TASK” and “Sleep 5” respectively which will delay the response of the page by 5 seconds.
+
 
 ![attack]({{ "/assets/images/insecure-deserialization/attack.png" | relative_url }})
 
-6.	And this is how we able to delay the page by 5 seconds.
+
+6. And this is how we are able to delay the page by 5 seconds.
+
 
 ![webgoatsuccess]({{ "/assets/images/insecure-deserialization/webgoatsuccess.png" | relative_url }})
 
 
 ## What is Gadgets and Chains?  ##
 
+
 A gadget—as used by Lawrence & Frohoff in their talk Marschalling Pickle at AppSecCali 2015—is a class or function that exists in the application which helps attacker to achieve a particular goal but a gadget may not by itself do anything harmful with user input.
 The exploitation strategy is to start with a “kick-off” gadget that’s executed after deserialization and build a chain of instances and method invocations to get to a “sink” gadget that’s able to execute arbitrary code or commands. Once attackers manage to get input to a sink gadget, they can do the maximum damage by performing an arbitrary code execution.
+
 
 ![gadgetchain]({{ "/assets/images/insecure-deserialization/gadgetchain.png" | relative_url }})
 
 _Photo_by: https://brandur.org/fragments/gadgets-and-chains
 
+
 Attacker needs access to the source code to identify such Gadgets and it’s a tedious task to do it manually. Fortunately, There are tools like "ysoserial" and "gadget insepctor" which helps us to identify such Gadgets.
+
 
 ## What is ysoserial and how to test with it? ##
 
+
 **ysoserial** is a tool for generating payloads that exploit unsafe Java object deserialization.
+
 
 We could see all these java libraries has gadget chains and if any of these library is happen to found in our applications classpath our application is vulnerable to Insecure deserialization vulnerability. So, today will take an example of commons-collections library and try to run arbitrary command.
 
-![YSoserial]({{ "/assets/images/insecure-deserialization/ysoserial.png" | relative_url }})
+
+![Ysoserial]({{ "/assets/images/insecure-deserialization/ysoserial.png" | relative_url }})
+
 
 "Usage: java -jar ysoserial.jar [payload] '[command]'"
 
@@ -103,7 +125,9 @@ With the help of ysoserial tool we created a payload and when we deserialized th
 
 ![GadgetChainTest]({{ "/assets/images/insecure-deserialization/gadgettest.png" | relative_url }})
 
+
 ## What are the mitigations we can apply? ##
+
 
 •	If possible, try to avoid serialization, instead use data formats like JSON or XML if there is no language constraints.
 •	If Serialization can't avoid and we are forced to implement Serialization due to their hierarchy. We can override deserialize method by throwing an exception.

@@ -43,7 +43,7 @@ Hex dump of the serialized employee object
 Here we serialized Vulnerable Object and deserialized it, so whatever command we have passed to Vulnerable Object got executed.
 
 
-![vulnerable]({{ "/assets/images/insecure-deserialization/vulnerable.png" | relative_url }})
+![Vulnerable]({{ "/assets/images/insecure-deserialization/vulnerable.png" | relative_url }})
 
 
 The point to make here is that, while deserialization the application is not verifying whether the input for deserialization is the one which we expect to deserialize? It's just deserializing whatever is being passed. With Vulnerable object we passed the command as calc.exe and it's just executed. What if the hacker pass some arbitrary code which may give a remote access to the hacker. Certainty its possible. That's why it's called as insecure deserialization.

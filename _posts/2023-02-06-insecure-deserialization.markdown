@@ -12,7 +12,8 @@ categories: Application security blogs
 **Serialization** refers to a process of converting an object into a format which can be persisted to disk (for example saved to a file or a datastore), sent through streams (for example stdout), or sent over a network. The format in which an object is serialized into, can either be binary or structured text (for example XML, JSON YAML…). JSON and XML are two of the most used serialization formats within web applications.
 
 **Deserialization** on the other hand, is the opposite of serialization, that is, transforming serialized data coming from a file, stream or network socket into an object.
-There are different libraries or classes for different languages for serialization/deserialization purposes such as in Python - Pickle,
+There are different libraries or classes for different languages for serialization/deserialization purposes such as in 
+Python - Pickle,
 PHP - Serialize/Unserialize,
 Java - ObjectInputStream/ObjectOutputStream and in
 JavaScript - JSON.stringfy()/JSON.parse()
@@ -32,7 +33,7 @@ Java example: We serialized an Employee object by implementing Serializable inte
 
 Hex dump of the serialized employee object
 
-![HexDump]({{ "/assets/images/insecure-deserialization/hex_dump.png" | relative_url }})
+![HexDump]({{ "/assets/images/insecure-deserialization/hexdump.png" | relative_url }})
 
 Here we serialized Vulnerable Object and deserialized it, so whatever command we have passed to Vulnerable Object got executed.
 
@@ -91,18 +92,18 @@ We could see all these java libraries has gadget chains and if any of these libr
 
 ![YSoserial]({{ "/assets/images/insecure-deserialization/ysoserial.png" | relative_url }})
 
-_Usage: java -jar ysoserial.jar [payload] '[command]'
+"Usage: java -jar ysoserial.jar [payload] '[command]'"
 
 The command will create a payload.ser file which we deserialize it.
 
-•	java.exe -jar ysoserial-all.jar CommonsCollections4 'calc.exe' > payload.ser
+**java.exe -jar ysoserial-all.jar CommonsCollections4 'calc.exe' > payload.ser**
 
 With the help of ysoserial tool we created a payload and when we deserialized that payload the command got executed. Likewise any remote code execution is possible if such classes are happened to found in our applications class path. Which is very dangerous. We might think that why anybody would keep such classes in our class path but many libraries like apache-commons, spring framework uses such classes. So it's always advisable that we keep our application dependencies updated with latest libraries.
 
 
 ![GadgetChainTest]({{ "/assets/images/insecure-deserialization/gadgettest.png" | relative_url }})
 
-## Mitigation ##
+## What are the mitigations we can apply? ##
 
 •	If possible, try to avoid serialization, instead use data formats like JSON or XML if there is no language constraints.
 •	If Serialization can't avoid and we are forced to implement Serialization due to their hierarchy. We can override deserialize method by throwing an exception.

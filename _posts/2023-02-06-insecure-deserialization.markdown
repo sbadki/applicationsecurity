@@ -28,13 +28,13 @@ Many programming languages support the serialization and deserialization of obje
 
 **Insecure deserialization** is a type of vulnerability that arises when an attacker can manipulate the serialized object and pass harmful data into the application code which cause unintended consequences in the program’s flow.
 
-Example: We serialized an Employee object by implementing Serializable interface.
+Example: We serialized an Employee object by implementing Serializable interface and deserialized it.
 
 
 ![JavaExample]({{ "/assets/images/insecure-deserialization/employee.png" | relative_url }})
 
 
-Hex dump of the serialized employee object
+Hex dump of the serialized employee object looks like below. It's easy to read and also can update it. 
 
 
 ![HexDump]({{ "/assets/images/insecure-deserialization/hexdump.png" | relative_url }})
@@ -64,24 +64,24 @@ e.g. "Try to change this serialized object in order to delay the page response f
 ![webgoateg]({{ "/assets/images/insecure-deserialization/webgoateg.png" | relative_url }})
 
 
-. We need to know whether there is any object which is getting serialized and deserialized. From the page it looks like it does as the string shown is starting with r00.(Serialized objects can be identified with string starting with AC ED or r00 in hex and base64 editor respectively)
-. Intercept the request in Burp Suite and see what’s getting pass in input field. Token=deserialize.
+1. We need to know whether there is any object which is getting serialized and deserialized. From the page it looks like it does as the string shown is starting with r00.(Serialized objects can be identified with string starting with AC ED or r00 in hex and base64 editor respectively)
+2. Intercept the request in Burp Suite and see what’s getting pass in input field. Token=deserialize.
 
 
 ![inspect]({{ "/assets/images/insecure-deserialization/inspect.png" | relative_url }})
 
 
-. Search for any magic methods like read Object() of ObjectInputStream. It's used by InsecureDeserializationTask. Its taking a token value from an input field directly without sanitizing it and deserializing it.
-. VulnerableTaskHolder Object is serializable object which is overriding readObject method which is executing command via.
+3. Search for any magic methods like read Object() of ObjectInputStream. It's used by InsecureDeserializationTask. Its taking a token value from an input field directly without sanitizing it and deserializing it.
+4. VulnerableTaskHolder Object is serializable object which is overriding readObject method which is executing command via.
       Process p = Runtime.getRuntime().exec(taskAction);
       taskAction is any string passed to its constructor. That means we can make use of this class to pass any command as string and serialized that object to perform remote code execution.
-. Create a test class which is serializing a VulnerableTaskHolder object by passing the taskName and taskAction as “TASK” and “Sleep 5” respectively which will delay the response of the page by 5 seconds.
+5. Create a test class which is serializing a VulnerableTaskHolder object by passing the taskName and taskAction as “TASK” and “Sleep 5” respectively which will delay the response of the page by 5 seconds.
 
 
 ![attack]({{ "/assets/images/insecure-deserialization/attack.png" | relative_url }})
 
 
-. And this is how we are able to delay the page response by 5 seconds.
+6. And this is how we are able to delay the page response by 5 seconds.
 
 
 ![webgoatsuccess]({{ "/assets/images/insecure-deserialization/webgoatsuccess.png" | relative_url }})
@@ -153,7 +153,7 @@ To conclude, this vulnerability is very dangerous, and it’s very difficult to 
 _https://github.com/frohoff/ysoserial
 _https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html
 _https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html
-_https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability/
-_https://snyk.io/blog/serialization-and-deserialization-in-java/
+_https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability
+_https://snyk.io/blog/serialization-and-deserialization-in-java
 
 ---

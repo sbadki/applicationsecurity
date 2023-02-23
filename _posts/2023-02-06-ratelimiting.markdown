@@ -36,12 +36,15 @@ We need API rate limiting to address few of the problems listed below. Although 
 
 
 1. User rate limits
+
    It is the most common and popular method of rate limiting. In this, a limit is applied on the no of requests a user can make in a given period of time. If any request's comes from the users after the specified time elapsed would simply reject's the request until the rate-limiting timeframe resets.
 
 2. Geographic rate limits
+
    The rate limit is specified based on the geographic location for a specified timeframe.For e.g. if we know that the users from the specific regions are not active during certain timeframe [12am:6am] then we can lower the rate limit for this timeframe. This way we can prevent suspicious traffic and further reduces the risk of an attack.
 
 3. Server rate limits
+
    This approach provides more flexibility, as to increase the rate limit on mostly used servers while decreasing the traffic limit on less active servers.
 
 
@@ -122,20 +125,20 @@ tokens will be carry forward to next minute in addition to 8 new tokens to full-
 If we receive 10 requests in first 45 seconds itself, then we would need to wait another 15 seconds to serve the requests.
 
 
-![dependency.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/dependency.JPG)
+![Dependency]({{ "/assets/images/ratelimit/dependency.png" | relative_url }})
 
 
 The Bucket is built with rate limit of 10 requests per minute, So the API will reject the requests if its already received
 10 requests in a time frame of 1 minute.
 
-![bucket_greedy.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/bucket_greedy.JPG)
+![Bucket_greedy]({{ "/assets/images/ratelimit/bucket_greedy.png" | relative_url }})
 
 
 But what if all the 10 requests came in first 5 seconds which consumed all the tokens leads to spike in the application
 suddenly.We can control this limit by applying multiple limits to the bucket. The bucket would serve 10 requests per
 minute but serve 5 requests in 20 seconds time window.
 
-![bucket_inter.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/bucket_inter.JPG)
+![Bucket_inter]({{ "/assets/images/ratelimit/bucket_inter.png" | relative_url }})
 
 
 ## Implementation:
@@ -144,7 +147,7 @@ minute but serve 5 requests in 20 seconds time window.
 tryConsume will Tries to consume specified number of tokens from the bucket during the specified timeframe.
 When it exceeds rate limit then it will reject the request with status code as HTTP - 429 TooManyRequests.
 
-![api_ratelimits.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/api_ratelimits.JPG)
+![Api_ratelimits]({{ "/assets/images/ratelimit/api_ratelimits.png" | relative_url }})
 
 
 ## Result:
@@ -152,7 +155,7 @@ When it exceeds rate limit then it will reject the request with status code as H
 All the requests after 5 seconds got rejected.
 
 
-![result.JPG](https://sbadki.github.io/appsec/assets/images/ratelimit/result.JPG)
+![Result]({{ "/assets/images/ratelimit/result.png" | relative_url }})
 
 Github repo: https://github.com/sbadki/applicationsecurity/tree/main
 

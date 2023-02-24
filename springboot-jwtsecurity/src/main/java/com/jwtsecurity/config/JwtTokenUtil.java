@@ -1,6 +1,7 @@
 package com.jwtsecurity.config;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtBuilder;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -11,10 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Function;
 
 @Slf4j
@@ -63,6 +61,11 @@ public class JwtTokenUtil {
     }
 
     private String doGenerateToken(Map<String, Object> claims, String username) {
+
+        Map<String, String> header = new HashMap<>();
+        header.put("alg", "HS256");
+        header.put("typ", "JWT");
+
         return Jwts
                 .builder()
                 .setClaims(claims)

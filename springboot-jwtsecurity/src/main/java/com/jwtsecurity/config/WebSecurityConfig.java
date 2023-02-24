@@ -19,23 +19,10 @@ public class WebSecurityConfig {
 
     private final DaoAuthenticationProvider authenticationProvider;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final AuthEntryPointJwt unauthorizedHandler;
+    private final AuthenticationEntryPointJwt unauthorizedHandler;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
-        //return http.csrf().and().cors().disable()
-//                .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-//
-//                .authorizeHttpRequests().requestMatchers("/api/auth/**").permitAll()
-//                                        .requestMatchers("/api/test/**").permitAll()
-//                                        .requestMatchers("/api/test/signup").permitAll()
-//                .anyRequest().authenticated().and()
-//                .authenticationProvider(authenticationProvider)
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-//                .build();
-
 
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()

@@ -9,12 +9,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
-import java.util.List;
-
 @RequiredArgsConstructor
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService, UserService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
 
@@ -25,39 +22,5 @@ public class UserDetailsServiceImpl implements UserDetailsService, UserService {
                 .orElseThrow(
                 () -> new UsernameNotFoundException("User not found with username : " + username));
         return UserDetailsImpl.build(user);
-    }
-
-    @Override
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new UsernameNotFoundException("User doesn't exist :" + userId));
-    }
-
-    @Override
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
-    }
-
-    @Override
-    public User updateUser(User userRequest) {
-        String username = userRequest.getUsername();
-        User user = userRepository.findByUsername(username).orElseThrow(
-                () -> new UsernameNotFoundException("User doesn't exist :" + username));
-
-        user.setPassword(userRequest.getPassword());
-        user.setUsername(userRequest.getUsername());
-        user.setEmail(userRequest.getEmail());
-        user.setRoles(new HashSet<>(userRequest.getRoles()));
-        return userRepository.save(user);
-
-    }
-
-
-    @Override
-    public void deleteUser(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User doesn't exist :" + userId));
-
-        userRepository.delete(user);
     }
 }

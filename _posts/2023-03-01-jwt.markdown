@@ -1,0 +1,207 @@
+---
+layout: post
+title:  "JSON Web Token Security"
+date:   2023-03-01 09:00:00 +0800
+categories: Application security blogs
+---
+
+## What is JSON Web Token? ##
+
+*JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties as a JSON object. This information can be verified and trusted because it is digitally signed. JWTs can be signed using a secret (with the HMAC algorithm) or a public/private key pair using RSA or ECDSA.*
+
+Here, securely transmitting means the data can't be tampered with, as its digitally signed. Optionally the data can also be encrypted. In simple terms if JWT is not encrypted but encoded its referred as JWS(Jason Web Signature) and when its encrypted its referred as (Jason Web Encryption)
+
+
+## What is the JSON Web Token structure? ##
+
+
+JSON Web Tokens consist of three parts which are separated by dots (.)
+
+1. Header
+2. Payload and
+3. Signature
+
+Both header and payload are represented by a JSON object.
+
+The **header** describes the cryptographic operations applied to the JWT with other optional properties. Typically we use "Typ" - Type of the token which is always JWT, and "alg" - The algorithm which would be used to sign the JSON Web Token. There are various algorithm to specify but mostly common once are HS256 and RS256.
+
+HS256 - HMAC SHA256 (symmetrical algorithm - server and client uses same secret to sign and verify the token respectively),
+RS256 - RSASSA-PKCS1-v1_5 with the SHA-256 hash (asymmetrical algorithm - uses private and public key pair to sign and verify the token at server and client side respectively)
+
+The **payload** represents a JSON object, it consist of claims conveyed by the JWT which is typically used by the server to verify that the user has permission to perform the action they are requesting.
+
+There are a set of standard key/value pairs that are defined as part of JWT payload, few common once are -
+• Sub (Subject): Identifies the user making the request and being authenticated
+• Iss (Issuer): The server that issued the token.
+• Aud (Audience): Provides some form of identification of the recipient of this token
+• Iat(Issued at) : Time when the token is issued by the server.
+• Exp (Expiration date): Tokens usually don’t last forever. Exp ensures that whoever is using the token provides a recently generated token
+
+
+The **Signature** is used to verify that the issuer of the JWT is who it is and to ensure that the messages wasn't changed along the way.
+
+Signature = HMACSHA256(
+base64UrlEncode(header) + "." +
+base64UrlEncode(payload),
+secret)
+
+
+So finally, JSON web token  = encoded header + "." + encoded payload + "."  +encoded signature
+
+
+![encodedjwt]({{ "/assets/images/jwt/fig1-encodedjwt.png" | relative_url }})
+
+
+If we Decode it we could see the JSON object for Header, Payload with the secret to verify the signature. Data passed in header or payload is in plain text, so it's not good idea to pass any sensitive information in those section.
+
+
+![jwtstructure]({{ "/assets/images/jwt/fig2-jwtstructure.png" | relative_url }})
+
+
+Above token is signed using HS256, which is self-contained, it has all the information needed for its validation.
+
+More details can be found on:  https://jwt.io/introduction/
+
+
+## Where do we use JWT? ##
+
+JWT is used in many places like for authentication, authorization and session management. It's useful for API authentication and server to server authorization.
+Many security specialist doesn't suggest JWT as session tokens. Refer  https://paragonie.com/blog/2017/03/jwt-json-web-tokens-is-bad-standard-that-everyone-should-avoid for more details.
+
+
+## JWT in action with example ##
+
+We have taken an example of client-server communication and how it's benefited by using JSON token.
+User roles are specified as "USER, ADMIN and MODERATOR", based on the Role, user is entitle to perform certain action.
+
+	1. Registering user by passing required information. 
+	2. Authenticating user by passing username and password, if successful JWT signed with secret is passed in the response
+	3. For every other request, user attaches JWT token in the Authorization header and send it to server. User doesn’t need to provide authentication on every request. 
+	4. Sever validates JWT and based on claims specified in the JWT token user can access the resource.
+	5. If the Token is tampered/if user doesn't have required permission to access the resource then 401: Unauthorized error would be thrown.
+
+
+![jwtstructure]({{ "/assets/images/jwt/fig3-appflow.png" | relative_url }})
+
+
+## What are Jason Web Token Exploits and its Mitigation? ##
+
+Here I'll be taking an examples from PortSwigger. Main goal is to access the Admin portal by logging in as admin user by exploiting JWT in various ways.
+
+### 1. Flawed Signature validation at server end. ### 
+This happens when applications fail to perform the JWT validation properly at server end. In this case attacker can modify the payload in JWT token and access the resource.
+
+By altering the payload we are able to access the admin portal.
+
+
+![exploit1payload]({{ "/assets/images/jwt/fig4-exploit1payload.png" | relative_url }})
+
+
+![exploit1result]({{ "/assets/images/jwt/fig5-exploit1result.png" | relative_url }})
+
+
+**Mitigation:** Application must verify the signature of the token whether It's valid or not?
+
+### 2. Accept token with no signature ###
+JWT supports different types of algorithms to generate a signature, to name a few RSA, HMAC, Eliptic Curve, None etc
+
+When algo: none is specified that means token is not signed. With the help of this attacker a bypass signature by changing the value of alg to none and stripping of signature from the JWT.
+
+By altering the header with alg: none,  we are able to access the admin portal.
+
+
+![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
+
+
+![exploit2result]({{ "/assets/images/jwt/fig7-exploit2result.png" | relative_url }})
+
+
+**Mitigation:** Application while verifying the token must verify the algo specified in the token is same as the one used while creating it.
+
+### 3. Brute forcing secret ###
+If server uses weak secret to sign the JWT then it's very easy for to bruit force it and re-create the JWT with the signature. Bruit forcing for a secret is easier with the help of hashcat utility.
+
+Following command gives you the secret if its weak
+Hashcat -a 0 -m 16500 <JWT> <list_of_known_password>
+
+Attacker can modify the malicious JWT and re-sign it with the secret he got it from bruit forcing.
+
+
+![exploit3result]({{ "/assets/images/jwt/fig8-exploit3result.png" | relative_url }})
+
+
+**Mitigation:** Application should use the strong password and must keep in the secret manager.
+
+### 4. JWT Header parameter injection ###
+
+Let's first understand what is JSON Web Key (jwk) and   JSON Web Key Sets (jwks)
+Jwk and jwks are optional headers provided by JWT specification.
+Item	Description
+JSON Web Key (JWK)	A JSON object that represents a cryptographic key. The members of the object represent properties of the key, including its value.
+JSON Web Key Set (JWKS)	A JSON object that represents a set of JWKs. The JSON object MUST have  a key member, which is an array of JWKs.
+Kid (Key Id)	Its use to match the specific key, This is used to choose among a set of keys within a JWK Set
+
+#### 4a. Jwk header injection ####
+
+At times server sends their public key in token as jwk format. Attacker can create a key and embed the public key in JWT token using jwk format as shown below and perform the attack.
+
+
+![exploit4aheader]({{ "/assets/images/jwt/fig9-exploit4aheader.png" | relative_url }})
+
+
+This attack is possible when there is flaw in JWT validation, say at server end application is only checking if kid value is present. It's not checking the kid value came in JWT is same as one present in jwks present at server end.
+
+**Mitigation:** Application should use modern validation library where in it should perform robust signature verification on JWT.
+
+#### 4b. Jku header injection ####
+
+At times server refers keys from JWK set URL (jku). When server has to verify the key it fetches the key from this url. Attacker can change the jku parameter value to point to their own JWK instead of the valid one. This allows an attacker to sign malicious token using their own private key and send it. Then the application would fetch this jwk and use it to verify the signature.
+
+![exploit4bheader]({{ "/assets/images/jwt/fig10-exploit4bheader.png" | relative_url }})
+
+
+Exploit.json
+
+
+![exploit4bjson]({{ "/assets/images/jwt/fig11-exploit4bjson.png" | relative_url }})
+
+
+**Mitigation:** Application should enforce a strict whitelisting of the permitted host for the jku header.
+
+#### 4c kid header parameter ####
+
+If application uses the kid param to retrieve the key from the filesystem, it might be vulnerable to directory traversal. Kid may refer to the particular entry in db or name of a file
+The attacker might force server to use arbitrary file as verification key. The attacker may try to insert /dev/null as the key source to force the application to use an empty key.
+
+/dev/null  this is an empty file which return empty string and Sign the jwt with empty string result in a valid signature:
+
+
+![exploit4cresult]({{ "/assets/images/jwt/fig12-exploit4cresult.png" | relative_url }})
+
+
+**Mitigation:** Application should not be vulnerable to path traversal or SQL injection via kid header parameter.
+
+
+### 5. JWT Algo confusion ### 
+
+
+JWT accepts both symmetric and asymmetric encryption algorithms. Depending on the encryption type, we need to use either a shared secret or a public-private key pair
+
+If application is using an asymmetric encryption, it can openly publish its public key and keep the private key secret. This allows the application to sign tokens using its private key and anyone can verify this token using its public key.
+
+We created malicious key using servers public key and sign the token using that malicious key. Also changed the alg to HS256.  Here the application does not check whether the algorithm of the received token matches the expected algorithm because of which algorithm confusion arises.
+
+
+![exploit5result]({{ "/assets/images/jwt/fig13-exploit5result.png" | relative_url }})
+
+
+**Mitigation:** Application should use modern validation library where in it should perform robust signature verification on JWT.
+
+
+## References: ##
+
+_https://portswigger.net/web-security/jwt
+
+_https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
+
+---

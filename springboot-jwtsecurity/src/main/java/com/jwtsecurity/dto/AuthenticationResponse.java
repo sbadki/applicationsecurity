@@ -12,6 +12,7 @@ import java.util.List;
 public class AuthenticationResponse {
 
     private String token;
+    private String refreshToken;
     private String type = "Bearer";
     private Long id;
     private String username;

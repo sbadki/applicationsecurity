@@ -68,6 +68,7 @@ public class JwtTokenUtil {
 
         return Jwts
                 .builder()
+                .setIssuer("example")
                 .setClaims(claims)
                 .setSubject(username)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -86,6 +87,10 @@ public class JwtTokenUtil {
     public Boolean isTokenValid(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    }
+
+    public String generateTokenFromUsername(String username) {
+        return doGenerateToken(new HashMap<>(), username);
     }
 
 }

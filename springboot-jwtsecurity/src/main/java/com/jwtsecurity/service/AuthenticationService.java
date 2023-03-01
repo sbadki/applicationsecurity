@@ -1,13 +1,12 @@
 package com.jwtsecurity.service;
 
 import com.jwtsecurity.config.JwtTokenUtil;
-import com.jwtsecurity.dto.AuthenticationRequest;
-import com.jwtsecurity.dto.AuthenticationResponse;
-import com.jwtsecurity.dto.SignupRequest;
-import com.jwtsecurity.dto.SignupResponse;
+import com.jwtsecurity.dto.*;
 import com.jwtsecurity.entity.ERole;
+import com.jwtsecurity.entity.RefreshToken;
 import com.jwtsecurity.entity.Role;
 import com.jwtsecurity.entity.User;
+import com.jwtsecurity.exception.RefreshTokenException;
 import com.jwtsecurity.repository.RoleRepository;
 import com.jwtsecurity.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,6 +31,7 @@ public class AuthenticationService {
     private final AuthenticationManager authenticationManager;
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final RefreshTokenService refreshTokenService;
     private final JwtTokenUtil jwtUtils;
     private final PasswordEncoder encoder;
 
@@ -49,12 +50,16 @@ public class AuthenticationService {
         List<String> roles = userDetails.getAuthorities().stream()
                 .map(role -> role.getAuthority()).collect(Collectors.toList());
 
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+
         return AuthenticationResponse.builder()
                 .id(userDetails.getId())
                 .username(userDetails.getUsername())
                 .email(userDetails.getEmail())
                 .roles(roles)
-                .token(jwt).build();
+                .token(jwt)
+                .refreshToken(refreshToken.getToken())
+                .build();
     }
 
 
@@ -106,5 +111,19 @@ public class AuthenticationService {
         userRepository.save(user);
 
         return new SignupResponse("User registered successfully");
+    }
+
+    public Optional<RefreshTokenResponse> refreshToken(RefreshTokenRequest request) {
+
+        String refreshToken = request.getRefreshToken();
+
+        return Optional.ofNullable(refreshTokenService.findByToken(refreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    String accessToken = jwtUtils.generateTokenFromUsername(user.getUsername());
+                    return new RefreshTokenResponse(refreshToken, accessToken, user.getEmail());
+                }).orElseThrow(() -> new RefreshTokenException(refreshToken, "No refreshToken found")));
+
     }
 }

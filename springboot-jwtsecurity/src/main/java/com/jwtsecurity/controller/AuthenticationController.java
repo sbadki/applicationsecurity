@@ -1,8 +1,10 @@
 package com.jwtsecurity.controller;
 
 import com.jwtsecurity.dto.AuthenticationRequest;
+import com.jwtsecurity.dto.RefreshTokenRequest;
 import com.jwtsecurity.dto.SignupRequest;
 import com.jwtsecurity.service.AuthenticationService;
+import com.jwtsecurity.service.RefreshTokenService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +24,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final RefreshTokenService refreshTokenService;
+
 
     @PostMapping("/signin")
     public ResponseEntity<?> authenticate(@Valid @RequestBody AuthenticationRequest request) {
@@ -32,5 +36,11 @@ public class AuthenticationController {
     @PostMapping("/signup")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest request) {
         return ResponseEntity.ok(authenticationService.register(request));
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
+
+        return ResponseEntity.ok(authenticationService.refreshToken(request));
     }
 }

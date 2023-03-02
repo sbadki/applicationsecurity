@@ -9,7 +9,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class SignupResponse {
+public class MessageResponse {
 
     private String message;
 }

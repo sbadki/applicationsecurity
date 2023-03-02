@@ -4,6 +4,7 @@ import com.jwtsecurity.entity.RefreshToken;
 import com.jwtsecurity.exception.RefreshTokenException;
 import com.jwtsecurity.repository.RefreshTokenRepository;
 import com.jwtsecurity.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -45,6 +46,7 @@ public class RefreshTokenService {
         return token;
     }
 
+    @Transactional
     public int deleteByUserId(Long userId) {
         return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
     }

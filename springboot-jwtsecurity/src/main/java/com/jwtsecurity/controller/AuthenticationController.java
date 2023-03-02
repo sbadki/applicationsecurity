@@ -1,13 +1,16 @@
 package com.jwtsecurity.controller;
 
 import com.jwtsecurity.dto.AuthenticationRequest;
+import com.jwtsecurity.dto.MessageResponse;
 import com.jwtsecurity.dto.RefreshTokenRequest;
 import com.jwtsecurity.dto.SignupRequest;
 import com.jwtsecurity.service.AuthenticationService;
 import com.jwtsecurity.service.RefreshTokenService;
+import com.jwtsecurity.service.UserDetailsImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,5 +45,17 @@ public class AuthenticationController {
     public ResponseEntity<?> refreshToken(@Valid @RequestBody RefreshTokenRequest request) {
 
         return ResponseEntity.ok(authenticationService.refreshToken(request));
+    }
+
+    @PostMapping("/signout")
+    public ResponseEntity<?> logoutUser() {
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = userDetails.getId();
+
+        int noOfEntries = refreshTokenService.deleteByUserId(userId);
+        if(noOfEntries > 0) {
+            return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+        }
+        return ResponseEntity.ok(new MessageResponse("No entry found"));
     }
 }

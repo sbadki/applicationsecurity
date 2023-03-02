@@ -17,6 +17,7 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final RefreshTokenService refreshTokenService;
     private final PasswordEncoder encoder;
 
     @Override
@@ -51,6 +52,11 @@ public class UserServiceImpl implements UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UsernameNotFoundException("User doesn't exist :" + userId));
 
-        userRepository.delete(user);
+        log.info("User {} with id {} to be deleted " , user.getUsername(), user.getId());
+        int noOfEntries = refreshTokenService.deleteByUserId(user.getId());
+        log.info("No of entries deleted : " +noOfEntries);
+        if(noOfEntries > 0) {
+            userRepository.delete(user);
+        }
     }
 }

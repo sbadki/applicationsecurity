@@ -152,7 +152,6 @@ To conclude, this vulnerability is very dangerous, and it’s very difficult to 
 
 _https://github.com/frohoff/ysoserial
 _https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html
-_https://cheatsheetseries.owasp.org/cheatsheets/Deserialization_Cheat_Sheet.html
 _https://foxglovesecurity.com/2015/11/06/what-do-weblogic-websphere-jboss-jenkins-opennms-and-your-application-have-in-common-this-vulnerability
 _https://snyk.io/blog/serialization-and-deserialization-in-java
 

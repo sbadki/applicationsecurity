@@ -63,14 +63,14 @@ public class AuthenticationService {
     }
 
 
-    public SignupResponse register(SignupRequest request) {
+    public MessageResponse register(SignupRequest request) {
 
         if(userRepository.existsByUsername(request.getUsername())) {
-            return new SignupResponse(request.getUsername() + " already exist.");
+            return new MessageResponse(request.getUsername() + " already exist.");
         }
 
         if(userRepository.existsByEmail(request.getEmail())) {
-            return new SignupResponse(request.getEmail() + " already exist.");
+            return new MessageResponse(request.getEmail() + " already exist.");
         }
 
         //Create new user
@@ -110,7 +110,7 @@ public class AuthenticationService {
         user.setRoles(roles);
         userRepository.save(user);
 
-        return new SignupResponse("User registered successfully");
+        return new MessageResponse("User registered successfully");
     }
 
     public Optional<RefreshTokenResponse> refreshToken(RefreshTokenRequest request) {

@@ -11,48 +11,48 @@ This is Spring Boot Application for JWT security.
 - Only Admin can access all users
 - User can access its details by passing user id
 
-![accesstokenflow](/assets/fig9-accesstokenflow.png)
+![accesstokenflow](/springboot-jwtsecurity/assets/fig9-accesstokenflow.png)
 
 - If the access token is expired, user can request for refresh token.
 - Once user get refresh token user can continue accessing other resources bases on roles he is assigned to. 
 
 ## Refresh token flow ##
 
-![refreshtokenflow](/assets/fig10-refreshtokenflow.png)
+![refreshtokenflow](/springboot-jwtsecurity/assets/fig10-refreshtokenflow.png)
 
 
 Application support following rest endpoints.
 
 Roles available: ADMIN/MODERATOR/USER
 
-1. Register user: http://localhost:8080/api/v1/auth/signup
+1. Register user: http:/localhost:8080/api/v1/auth/signup
 
-![signup](/assets/fig1-signup.png)
+![signup](/springboot-jwtsecurity/assets/fig1-signup.png)
 
-2. Authenticate user: http://localhost:8080/api/v1/auth/signin
+2. Authenticate user: http:/localhost:8080/api/v1/auth/signin
 
-![authenticate](/assets/fig2-authenticate.png)
+![authenticate](/springboot-jwtsecurity/assets/fig2-authenticate.png)
 
-3. Get all users: ttp://localhost:8080/api/v1/users/all
+3. Get all users: ttp:/localhost:8080/api/v1/users/all
 
-![allusers](/assets/fig3-allusers.png)
+![allusers](/springboot-jwtsecurity/assets/fig3-allusers.png)
 
-4. Get user by id: http://localhost:8080/api/v1/users/{id}
+4. Get user by id: http:/localhost:8080/api/v1/users/{id}
 
-![accessuser](/assets/fig4-accessuser.png)
+![accessuser](/springboot-jwtsecurity/assets/fig4-accessuser.png)
 
-5. Delete user: http://localhost:8080/api/v1/users/1
+5. Delete user: http:/localhost:8080/api/v1/users/1
 
-![deleteuser](/assets/fig12-deleteuser.png)
+![deleteuser](/springboot-jwtsecurity/assets/fig12-deleteuser.png)
 
-6. Update user: http://localhost:8080/api/v1/users/mod/3
+6. Update user: http:/localhost:8080/api/v1/users/mod/3
 
-![updateuser](/assets/fig11-updateuser.png)
+![updateuser](/springboot-jwtsecurity/assets/fig11-updateuser.png)
  
-7. Token expired : http://localhost:8080/api/v1/users/all
+7. Token expired : http:/localhost:8080/api/v1/users/all
 
-![tokenexpired](/assets/fig6-tokenexpired.png)
+![tokenexpired](/springboot-jwtsecurity/assets/fig6-tokenexpired.png)
 
-8. Refresh token:http://localhost:8080/api/v1/auth/refreshtoken
+8. Refresh token:http:/localhost:8080/api/v1/auth/refreshtoken
 
-![refreshtoken](/assets/fig7-refreshtoken.png)
+![refreshtoken](/springboot-jwtsecurity/assets/fig7-refreshtoken.png)

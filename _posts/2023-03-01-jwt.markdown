@@ -30,14 +30,14 @@ The **header** describes the cryptographic operations applied to the JWT with ot
 is always JWT, and "alg" - The algorithm which would be used to sign the JSON Web Token. There are various algorithm to specify but mostly common once 
 are HS256 and RS256.
 
-HS256 - HMAC SHA256 (symmetrical algorithm - server and client uses same secret to sign and verify the token respectively)
-RS256 - RSASSA-PKCS1-v1_5 with the SHA-256 hash (asymmetrical algorithm - uses private and public key pair to sign and verify the token at server and 
-client side respectively)
+HS256 - HMAC SHA256 (symmetrical algorithm - server and client uses same secret to sign and verify the token respectively).
+RS256 - RSASSA-PKCS1-v1_5 with the SHA-256 hash (asymmetrical algorithm - uses private and public key pair to sign and verify the token at server and client side respectively).
 
 The **payload** represents a JSON object, it consists of claims conveyed by the JWT which is typically used by the server to verify that the user has 
 permission to perform the action they are requesting.
 
-There are a set of standard key/value pairs that are defined as part of JWT payload, few common once are
+There are a set of standard key/value pairs that are defined as part of JWT payload, few common once are:
+
 • Sub (Subject): Identifies the user making the request and being authenticated.
 • Iss (Issuer): The server that issued the token.
 • Aud (Audience): Provides some form of identification of the recipient of this token.
@@ -59,7 +59,7 @@ So finally, JSON web token  = encoded header + "." + encoded payload + "."  +enc
 ![encodedjwt]({{ "/assets/images/jwt/fig1-encodedjwt.png" | relative_url }})
 
 
-If we Decode it we could see the JSON object for Header, Payload with the secret to verify the signature. Data passed in header or payload is in plain 
+If we decode it we could see the JSON object for Header, Payload with the secret to verify the signature. Data passed in header or payload is in plain 
 text, so it's not good idea to pass any sensitive information in those section.
 
 
@@ -68,7 +68,7 @@ text, so it's not good idea to pass any sensitive information in those section.
 
 Above token is signed using HS256, which is self-contained, it has all the information needed for its validation.
 
-More details can be found on:  https://jwt.io/introduction/
+For more details refer-https://jwt.io/introduction/
 
 
 ## Where do we use JWT? ##
@@ -133,17 +133,18 @@ access the resource.
 4. Modify the "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
 
 ![exploit1payload]({{ "/assets/images/jwt/fig4-exploit1payload.png" | relative_url }})
-
 5. Modify GET request to access /admin request and send
 6. By altering the payload we are able to access the admin portal.
 
 ![exploit1result]({{ "/assets/images/jwt/fig5-exploit1result.png" | relative_url }})
-
 7. We can look for the /delete api and access that api to delete any user. 
 
-**Mitigation:** Application must verify the signature of the token whether It's valid or not?
+**Mitigation:** 
+Application must verify the signature of the token whether It's valid or not?
+
 
 ### 2. Accept token with no signature ###
+
 
 JWT supports different types of algorithms to generate a signature, to name a few RSA, HMAC, Eliptic Curve, None etc
 
@@ -163,23 +164,25 @@ By altering the header with alg: none,  we are able to access the admin portal.
 keeping trailing dot (.) as is,
 
 ![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
-
 5. Modify GET request to access /admin request and send
 6. By modifying the algo we are able to access the admin portal.
 
 ![exploit2result]({{ "/assets/images/jwt/fig7-exploit2result.png" | relative_url }})
-
 7. We can look for the /delete api and access that api to delete any user. 
 
 
-**Mitigation:** Application must verify the token for algo specified in the token is same as the one used while creating it.
+**Mitigation:** 
+Application must verify the token for algo specified in the token is same as the one used while creating it.
+
 
 ### 3. Brute forcing secret ###
+
 
 If server uses weak secret to sign the JWT then it's very easy to bruit force it and re-create the JWT with the signature. Bruit forcing for a secret is 
 easier with the help of Hashcat utility.
 
 **Hashcat Utility:**
+
 Hashcat needs 1. Valid JWT and 2. List of known hash passwords. It signs the Header and payload from the JWT we pass in the command with the secret 
 available in the known hashed password list.Then it compares the resulting signature with the original one from the server. if any of the signature 
 matches, Hashcat shows the identified secret in the format:
@@ -199,22 +202,21 @@ secret using Hashcat utility.
 4. Brute force secret using HashCat utility. This will give the secret.
 
 ![exploit2result]({{ "/assets/images/jwt/fig8a-hashcatresult.png" | relative_url }})
-
-5. Will create a symmetric key and sign it with the secret we got via bruteforce.
-
+5. Create a symmetric key and sign it with the secret we got via bruteforce.
 6. Modify GET request to access /admin request. Update payload "sub" change to "administrator" and sign the token with the key created in above step.
 
 ![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
 
 ![exploit2result]({{ "/assets/images/jwt/fig7-exploit2result.png" | relative_url }})
-
 7. We can look for the /delete api and access that api to delete any user. 
 
 
-**Mitigation:** Application should use the strong password and must keep in the secret manager for more security.
+**Mitigation:** 
+Application should use the strong password and must keep in the secret manager for more security.
 
 
 ### 4. JWT Algo confusion ### 
+
 
 Here the application does not check whether the algorithm of the received token matches the expected algorithm because of which algorithm confusion arises.
 JWT accepts both symmetric and asymmetric encryption algorithms. Depending on the encryption type, we need to use either a shared secret or a 
@@ -236,7 +238,8 @@ sign tokens using its private key and anyone can verify this token using its pub
 ![exploit5result]({{ "/assets/images/jwt/fig13-exploit5result.png" | relative_url }})
 
 
-**Mitigation:** Application should use modern validation library where in it should perform robust signature verification on JWT. Should always check 
+**Mitigation:** 
+Application should use modern validation library where in it should perform robust signature verification on JWT. Should always check 
 whether the algo specified in the token is same as the one used while creating it.
 
 

@@ -1,0 +1,107 @@
+---
+layout: post
+title:  "PART 2 : JSON Web Token exploits and mitigation"
+date:   2023-03-06 04:25:00 +0800
+categories: Application security blogs
+---
+This is in continuation with the earlier blog _https://sbadki.github.io/applicationsecurity/posts/2023-03-01-jwt.html
+
+## JWT Header parameter injection ##
+
+Let's first understand what is JSON Web Key (jwk) and  JSON Web Key Sets (jwks). Jwk and jwks are optional parameter header. 
+
+![exploitjwk]({{ "/assets/images/jwt/fig15-jwk.png" | relative_url }})
+
+### Jwk header injection ###
+
+Jason Web Signature allows you to add a "jwk" attribute to the header to inform the receiver which key was used to sign the token. 
+
+Attacker can create a key and embed the public key in JWT token using jwk format as shown below and perform the attack.
+
+1. Login with the credentials' wiener : peter
+2. Intercept GET /my-account request, we would see the JWT is token is passed in cookie.
+3. Select the header, and decode it to Base64, we would see its content as:
+   {
+   "kid":"fa15d143-1b71-4363-85cd-b8002c4e920b2",
+   "alg":"RS256"
+   }
+4. Modify payload, "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
+5. Modify GET request to access /admin request. Update payload, "sub":"administrator" 
+6. Create asymmetric key using JWT extension tool, and embed into the jwt token under JSON Web Token section. Which will a jwk attributes to the token.
+
+![exploit4aheader]({{ "/assets/images/jwt/fig9-exploit4aheader.png" | relative_url }})
+
+7. Send the request and look for the /delete api and access that api to delete any user.
+
+This attack is possible when there is flaw in JWT validation, say at server end application is only checking if kid value is present. 
+It's not checking the kid value came in JWT from client is same as one present in jwks present at server end.
+
+**Mitigation:** 
+1. Application should use modern validation library to perform robust signature verification on JWT.
+2. Should have key-rotation built-in
+3. Use strong keys and secret.
+
+### Jku header injection ###
+
+At times server refers keys from JWK set URL (jku). Sometimes JWK sets are exposed publicly via a standard endpoint - /.well-known/jwks.json.
+
+When server has to verify the key it fetches the key from this url. Attacker can change the jku parameter value to point to their own JWK instead of the
+valid one. This allows an attacker to sign malicious token using their own private key and send it. Then the server would fetch this malicious jwk and use it
+to verify the signature.
+
+1. Login with the credentials' wiener : peter
+2. Intercept GET /my-account request, we would see the JWT is token is passed in cookie.
+3. Select the header, and decode it to Base64, we would see its content as:
+   {
+   "kid":"fa15d143-1b71-4363-85cd-b8002c4e920b2",
+   "alg":"RS256"
+   }
+4. Modify payload "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
+5. Upload malicious JWK set to the exposed JWK set endpoint.
+
+![exploit4bjson]({{ "/assets/images/jwt/fig11-exploit4bjson.png" | relative_url }})
+
+6. Point kid value to the one uploaded in the exposed JWK set endpoint.
+7. Add "jku" : "exposed url path"
+
+![exploit4bheader]({{ "/assets/images/jwt/fig10-exploit4bheader.png" | relative_url }})
+
+8. Sign the token with the key created and access the GET /admin request.
+9. Send the request and look for the /delete api and access that api to delete any user.
+
+**Mitigation:** Application should enforce a strict whitelisting of the permitted host for the jku header.
+
+### kid header parameter ###
+
+The header can contain the kid parameter. If application uses the kid param to retrieve the key from the filesystem, it might be vulnerable to directory 
+traversal. Kid may refer to the particular entry in db or name of a file.The attacker might force server to use arbitrary file as verification key. 
+The attacker may try to insert /dev/null as the key source to force the application to use an empty key.
+
+/dev/null  this is an empty file which return empty string and Sign the jwt with empty string result in a valid signature.
+
+1. Login with the credentials' wiener : peter
+2. Intercept GET /my-account request, we would see the JWT is token is passed in cookie.
+3. Select the header, and decode it to Base64, we would see its content as:
+   {
+   "kid":"fa15d143-1b71-4363-85cd-b8002c4e920b2",
+   "alg":"HS256"
+   }
+4. Modify payload "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
+5. Crete a new symmetric key and update the value of k param to the encoded null byte (AA==).
+6. Update kid param and point it to empty key (../../../../../../dev/null)
+7. Sign the token with the key created in step 5 and access the GET /admin request.
+8. Send the request and look for the /delete api and access that api to delete any user.
+
+![exploit4cresult]({{ "/assets/images/jwt/fig12-exploit4cresult.png" | relative_url }})
+
+**Mitigation:** Verify if application is vulnerable to path traversal or SQL injection via kid header parameter and mitigate it applying strict validation.
+
+## References: ##
+
+_https://www.rfc-editor.org/rfc/rfc7515
+
+_https://portswigger.net/web-security/jwt
+
+_https://cheatsheetseries.owasp.org/cheatsheets/JSON_Web_Token_for_Java_Cheat_Sheet.html
+
+Github repo: https://github.com/sbadki/applicationsecurity/tree/main/springboot-jwt-example

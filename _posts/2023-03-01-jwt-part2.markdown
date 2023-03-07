@@ -65,11 +65,9 @@ to verify the signature.
    }
 4. Modify payload "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
 5. Upload malicious JWK set to the exposed JWK set endpoint.
-
 ![exploit4bjson]({{ "/assets/images/jwt/fig11-exploit4bjson.png" | relative_url }})
 6. Point kid value to the one uploaded in the exposed JWK set endpoint.
 7. Add "jku" : "exposed url path"
-
 ![exploit4bheader]({{ "/assets/images/jwt/fig10-exploit4bheader.png" | relative_url }})
 8. Sign the token with the key created and access the GET /admin request.
 9. Send the request and look for the /delete api and access that api to delete any user.

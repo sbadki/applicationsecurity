@@ -1,0 +1,257 @@
+---
+layout: post
+title:  "Cross Origin Resource Sharing"
+date:   2023-03-10 04:35:00 +0200
+categories: Application security blogs
+---
+
+Before directly jumping over understanding what is CORS will understand about SOP.
+
+## What is Same-origin Policy(SOP)? ##
+
+
+Same origin policy is a browser security feature which allows JavaScript to access resources, only from the same origin, it doesn't allow access to the resources 
+from different origin or Cross-origin. 
+
+Origin consist of 
+	• Application protocol 
+	• Domain name and 
+	• TCP port. 
+
+For e.g. http://www.alice.com which consist of {protocol, host, port} . Here URI protocol is https, domain is example and port is 80 (default port of http). 
+
+Two resources are considered to be of the same origin if and only if all these values are exactly the same. To understand this clearly see examples from following 
+tables which shows which 
+origin is allowed and which is not with respect to URL http://www.alice.com
+
+
+![table]({{ "/assets/images/cors/fig1-table.png" | relative_url }})
+
+
+Note: Only exception for the URL http://www.alice.com:81/pages on Internet Explorer, it only check for protocol and domain if its match, it doesn't check for port. 
+
+
+## What happens if we do not use SOP? ##
+
+
+If bank website https://world-bank.com is open on any of your browser(chrome, firefox, safari etc). You authenticated yourself on the bank website and on another tab 
+you happen to open the https://attacker.com considering that's the attackers site. If SOP feature is not set for the browser then you can get the sensitive information 
+from world-bank.com to attacker website with the help of Javascript which we do not want to happen in real. 
+
+By setting this policy restricting random website to make request to your bank with the cookies stored in your browser. Otherwise, the attacker would have access to 
+your credentials from the stolen cookies. That's why all the browser by default keep same-origin-policy. 
+
+But doesn't this affect the behaviour of getting resources from another domain or subdomains on your site to improve the user experience. Definitely yes, that's why 
+if we need resources from any other domain then we need to specify the CORS headers which will go through next. 
+
+
+## What is Cross Origin Resource Sharing (CORS) ##
+
+
+CORS is a browser mechanism which allows controlled access to the resources from different domain. 
+
+If we are making request from http://www.alice.com to http://www.bob.com and wants to utilise resources from www.bob.com then the server needs to send some headers 
+in the response to understand that the CORS is possible between these two domains. 
+
+The server configures CORS headers like "Access-Control-Allow-Origin" and "Access-Control-Allow-Credentials" etc. in the response only if they receive a request header 
+containing "Origin" header as "http://www.alice.com" in our case.
+
+
+Example : We are trying to access resource from http://localhost:8090/users on site http://localhost:8000. 
+
+Before: We could see that we got an error, 'Allow-Access-Control-Origin' missing error and we are unable to access users from the api.
+
+
+![sop]({{ "/assets/images/cors/fig2-sop.png" | relative_url }})
+
+
+After setting 'Allow-Access-Control-Origin': 'localhost:8000'
+
+We are allowed to view the users details. See the Response below.
+
+
+![cors]({{ "/assets/images/cors/fig3-cors.png" | relative_url }})
+
+
+### "Access-Control-Allow-Origin" Header ###
+
+
+This identifies the permitted origin of the request. This is the part of response header. So browser will match If Access-Control-Allow-Origin header value is matching
+with the Origin header sent by the requesting website i.e. www.alice.com in the request then resource sharing is permitted between these two sites.
+
+This has three possible values.
+
+Allows any origins
+	Access-Control-Allow-Origin : *
+
+Only allow request from www.alice.com origin
+	Access-Control-Allow-Origin : http://www.bob.com
+
+No origin is specified
+	Access-Control-Allow-Origin : null                                  
+
+
+### "Access-Control-Allow-Credentials" Header ###
+
+
+By specifying "Access-Control-Allow-Credentials" header server notifies client that whether credentials (like Cookies and Authentication data ) should be sent with
+the request. This is done by sending "Access-Control-Allow-Credentials": "true". 
+
+Example:
+
+	HTTP Request:
+	GET /pages/1 HTTP/1.1
+	Host: www.bob.com
+	Origin: www.alice.com
+	Cookie: SessonId=<somevalue>
+	Connection: close
+
+	HTTP Response:
+	HTTP/1.1 200 OK
+	Access-Control-Allow-Credentials: true
+	Access-Control-Allow-Origin: www.alice.com
+
+Access-control-allow-credentials: true after this, browser will allow to read the response by www.alice.com came from www.bob.com as allow credential is true. Without 
+this the browser will not allow access to the response.
+
+
+At this moment, If we have to support multiple Origin 
+	Access-Control-Allow-Origin : http://www.bob.com; http://www.bob2.com  this is not supported.
+
+No browser supports multiple origin at this moment, so only option to support multiple origin is to specify Access-Control-Allow-Origin : * , it will allow any origin, 
+also if wildcard is supported then browser doesn't support "Access-Control-Allow-Credentials : true". This is the limitation of the browser as with this setup transfer 
+of credentials like authentication, cookies or TLS certs is not permitted.
+
+So application developer try to find the workaround to support multiple domains by generating dynamic origins which starts causing security issues if it's CORS policy 
+is not configured and implemented properly.
+
+
+### "Access-Control-Allow-Methods" Header ###
+
+
+For some HTTP requests like {POST, PUT, DELETE}, CORS specification mandates to send Pre-Flight requests. This will trigger additional request before the cross-origin request.
+The Pre-flight request is issues with an OPTION request, which basically checks whether target application has CORS enabled and supports different options sent in a request.
+
+**Pre-flight request:** 
+
+    Pre-flight HTTP Request:
+    OPTIONS /pages/1 HTTP/1.1
+    Host: www.bob.com
+    Origin: www.alice.com
+    Connection: close
+
+    HTTP Response:
+    HTTP/1.1 204 No Content
+    Access-Control-Allow-Credentials: true
+    Access-Control-Allow-Origin: www.alice.com
+    Access-Control-Allow-Methods: DELETE, GET, OPTIONS
+
+**Real request:**
+
+    HTTP Request:
+    DELETE /pages/1 HTTP/1.1
+    Host: www.bob.com
+    Origin: www.alice.com
+    Connection: close
+    
+    HTTP Response:
+    HTTP/1.1 200 OK
+    Access-Control-Allow-Credentials: true
+    Access-Control-Allow-Origin: www.alice.com
+    Connection: close
+
+## What are the CORS Vulnerabilities? ##
+
+
+ To show this how the vulnerabilities actually takes place, will take an examples from PortSwigger.
+
+###	1. Allow arbitrary origins: ###
+
+
+1.GET /accountDetails request we could see that the response contains: 'Access-Control-Allow-Credentials' : true
+
+![arbitrary]({{ "/assets/images/cors/fig4-arbitrary.png" | relative_url }})
+
+2.Try to send any 'Origin' in the header, response simply refer back the same origin pass in the request, that means it's allowing any origin to access the resource. 
+Which is vulnerable. 
+
+![acctdtls]({{ "/assets/images/cors/fig5-lab1-accdtls.png" | relative_url }})
+
+3.Now we craft the Javascript code and submit to exploit server on the PortSwigger to fetch the API keys. This would give us the API keys. Like-wise if we can get 
+cookies and fetch or TLS cert. 
+
+![arbitrary]({{ "/assets/images/cors/fig6-script-arbitrary.png" | relative_url }})
+
+
+###	2. Passing Origin as null ###
+
+
+May times, developer configures value of header Origin: null assuming it doesn't allow cross-domain request. But this is not different that passing wildcard (*) which 
+allow anything. In fact this is more dangerous than wildcard is because we can pass Access-Control-Allow-Credentials as true. So this would give access to any origin 
+to access the credentials.
+
+1.Check if any origin is accepted by the request - here it's not accepting any origin
+
+![sameorigintry]({{ "/assets/images/cors/fig7-lab2-step1.png" | relative_url }})
+
+2.Try if accepts null, we could see it's been reflected in response. 
+
+![nullorigintry]({{ "/assets/images/cors/fig8-lab2-step2.png" | relative_url }})
+
+3.Craft a JavaScript code to fetch the API keys and submit that to exploit server. Ifame sandbox will generate the Origin null request.
+
+![iframecode]({{ "/assets/images/cors/fig9-lab2-step3.png" | relative_url }})
+
+4.Api keys are shown in exploit server
+
+![result]({{ "/assets/images/cors/fig10-lab2-result.png" | relative_url }})
+
+
+###	3. Dynamic generation of Origin header ###
+
+
+When  Developer dynamically generate the origin header to support multiple origin by the site, they tend to do many mistakes like, they may just check whether the 
+allowed origin header contains the word by matching suffix and prefix of the origin. Which leads to the problem of allowing subdomains.
+
+Try to pass the Origin as subdomain, it accepts that means it's vulnerable to CORS attack. Attacker might try to find if there is any XSS vulnerability on other page
+and try to exploit this CORS with XSS, or he could see if he can perform any Man in the middle attack to send request from subdomain and perform the CORS attack.
+
+![lab3]({{ "/assets/images/cors/fig11-lab3.png" | relative_url }})
+
+
+## What are the CORS Mitigation? ##
+
+
+	1.Make sure to configure CORS headers properly. 
+
+	2.Developers need to understand the presence of CORS headers in the configurations like below two headers doesn't go together, we can't specify credentials 
+    header as true when the origin is wildcard
+	
+	Access-Control-Allow-Credentials : true
+	Access-Control-Allow-Origin: *
+
+	3.Following combination allowing any site to access the resources, where in developer assumes that he hasn't specified any origin.
+	 
+	Access-Control-Allow-Credentials : true
+	Access-Control-Allow-Origin: null
+	
+	4.To support multiple origins, many times developer dynamically generate origins and verify it with passed in origin header in request. Make sure to check 
+    dynamically generated header with the whitelisted origins otherwise anybody would trick passing request from subdomains and server accepts the requests 
+    considering that's the valid domain.
+
+
+## References: ##
+
+https://portswigger.net/web-security/jwt
+
+
+
+
+
+
+
+
+
+
+
+

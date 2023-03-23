@@ -81,14 +81,14 @@ with the Origin header sent by the requesting website i.e. www.alice.com in the 
 
 This has three possible values.
 
-Allows any origins
-	Access-Control-Allow-Origin : *
+Allows any origins:
+Access-Control-Allow-Origin : *
 
-Only allow request from www.alice.com origin
-	Access-Control-Allow-Origin : http://www.bob.com
+Only allow request from www.alice.com origin:
+Access-Control-Allow-Origin : http://www.alice.com
 
-No origin is specified
-	Access-Control-Allow-Origin : null                                  
+No origin is specified:
+Access-Control-Allow-Origin : null                                  
 
 
 ### "Access-Control-Allow-Credentials" Header ###
@@ -242,8 +242,7 @@ and try to exploit this CORS with XSS, or he could see if he can perform any Man
 
 ## References: ##
 
-https://portswigger.net/web-security/jwt
-
+https://portswigger.net/web-security/cors
 
 
 

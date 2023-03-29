@@ -1,0 +1,179 @@
+---
+layout: post
+title:  "Same Origin Policy"
+date:   2023-03-10 04:00:00 +0200
+categories: Application security blogs
+---
+
+
+Before directly jumping over understanding what is CORS will understand about Same Origin Policy (SOP).
+
+Same origin policy is a browser security feature which allows JavaScript to access resources, only from the same origin, 
+it doesn't allow access to the resources from different origin or Cross-origin. 
+
+Origin consist of 
+	• Application protocol 
+	• Domain name and 
+	• TCP port. 
+
+For e.g. http://www.alice.com which consist of {protocol, host, port} . Here URI protocol is http, domain is example and 
+port is 80 (default port of http). 
+
+Two resources are considered to be of the same origin if and only if all these values are exactly the same. To understand 
+this clearly see examples from following tables which shows which origin is allowed and which is not with respect to URL 
+http://www.alice.com
+
+
+![table]({{ "/assets/images/sop/fig1-table.png" | relative_url }})
+
+
+Note: Only exception for the URL http://www.alice.com:81/pages on Internet Explorer, it is only check for protocol and 
+domain if its match, it doesn't check for port. 
+
+
+
+## What happens if we do not use SOP? ##
+
+
+
+If bank website https://world-bank.com is open on any of your browser(chrome, firefox, safari etc). You authenticated 
+yourself on the bank website and on another tab you happen to open the https://attacker.com considering that's the 
+attackers site. If SOP feature is not set for the browser then you can get the sensitive information from world-bank.com 
+to attacker website with the help of Javascript which we do not want to happen in real. 
+
+By setting this policy, restricting random website to make request to your bank with the cookies stored in your browser. 
+Otherwise, the attacker would have access to your credentials from the stolen cookies. That's why all the browser by 
+default keep same-origin-policy. 
+
+But doesn't this affect the behaviour of getting resources from another domain or subdomains on your site.Definitely yes, 
+that's why if we need resources from any other domain then we need to specify the CORS headers at the server level which 
+will go through in next post. 
+
+
+**There are certain exceptions to SOP policy**
+
+
+## Embedded resources like images,CSS,video,audio,link,object,embed,forms,iframes and scripts can be accessed and loaded across different origins. ##
+
+
+SOP allows resources to be embedded but doesn't allow cross-origin reading.This means that you can send cross-origin 
+request but can't read the response.
+
+**Sites can hyperlink to any other site but can't read the response.**
+
+	<a href="http://bob.example.com/bob/bob.html/">
+
+**Sites can POST the message with form but can't read the response.**
+	
+	<form action="http://bob.example.com/bob/bob.html" method="post">
+
+**Sites can display images from any other site but can't read image data from other sites.**
+
+	<img src="http://bob.example.com/bob/dog-jpeg"/>
+
+Also applies to other static media - movies, audio etc
+
+**Sites can include css from any other site but can't read CSS data from other sites.**
+
+	<link rel="stylesheet" type="text/css" href="http://bob.example.com/bob/site.css"/>
+
+**Sites can include javascript from any other site. The Javascript runs in the originating site.**
+	
+	<script src="http://bob.example.com/bob/data.js">
+
+**Cookies can be accessible from subdomains**
+
+
+
+## SOP forbids cookies, Javascript, DOM ##
+
+
+
+1. Cookies can't be sent to a page with a different origin, except its subdomain. For example -
+
+    Cookies from alice.example.com can't be shared with bob.example.com.
+    but Cookies from example.com can be shared with its subdomains like alice.example.com and bob.example.com.
+
+2. AJAX requests, like XMLHTTPRequest are not allowed under SOP, this is possible if (Cross-Origin Resource Sharing) CORS 
+is implemented.
+
+
+![ajaxcrosssite]({{ "/assets/images/sop/fig2-ajax.png" | relative_url }})
+
+
+3.Javascript code and Document Object Model(DOM) can't read content on a website with a different origin, even when its 
+embedded.
+
+
+
+## Relaxing same origin policy ## 
+
+SOP is often too restrictive for modern web applications as subdomains or multiple domains of the large website won't be 
+able to share the information. So,to relax the policy a little following work around were found out.   
+
+
+
+### Using document.domain ### 
+
+
+We can set the domain of different subdomains by using document.domain property to enables them to share resources 
+between them. For example, alice.example.com and bob.example.com both needs to set document.domain to example.com so 
+that they can interact with each other and share the information amongst them.
+
+
+
+### Using JSONP ###
+
+
+SOP allows Javascript to retrieve and executes from different domains. So, we can include external script file from 
+different domain. For example, <script src="http://bob.example.com/bob/data.js"></script> which loads JSONP payload 
+which is then processed via the included callback function and can be accessed.
+
+![jsonp]({{ "/assets/images/sop/fig4-jsonp.png" | relative_url }})
+
+
+![jsonpresult]({{ "/assets/images/sop/fig5-jsonpresult.png" | relative_url }})
+
+
+### Using postMessage ###
+
+
+With the help of postMessage() method on window we can send text-based messages to other pages. Sender specifies 
+the origin it is sending a message to and Receiver checks from which origin it's receiving the message.
+
+	Sender:
+	window.framea.postMessage(message, "http://alice.example.com/alice/alice.html")
+
+	Receiver:
+	Add event listener to receive message from the origin
+
+
+![postmessage]({{ "/assets/images/sop/fig3-postmessage.png" | relative_url }})
+
+
+
+### Using CORS ###
+
+
+
+Cross Origin Resource Sharing CORS is a browser mechanism which allows controlled access to the resources from different
+domain. It uses HTTP headers to define the origin permissions. More details can be referred from CORS post.  
+
+
+
+## References: ##
+
+https://portswigger.net/web-security/cors
+
+The core of web security @ OWASP Wellington
+
+
+
+
+
+
+
+
+
+
+

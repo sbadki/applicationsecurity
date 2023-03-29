@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="site.css">
+    </head>
+
+    <body>
+        <h1>JSONP test page</h1>
+
+        <h2 id="demo"></h2>
+
+	<script>
+		function process(input) {
+		 window.demo.innerHTML = input;
+		}
+	</script>
+
+	<script src="http://bob.example.com/bob/data.js"></script>
+
+     <hr>
+       <p id="b1">
+        Last modified at: 
+       </p>
+       <script> 
+        let lastModified = new Date(document.lastModified);
+        document.getElementById("b1").innerHTML = lastModified;
+        </script>
+    </hr>
+    </body>
+</html>

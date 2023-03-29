@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <h1>CORS demo</h1>
+
+    <h2 id="demo"></h2>
+
+    <p>
+        <button type="button" onclick="request()"> Request from bob.example.com</button>
+    </p>
+
+    <script>
+        function request() {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    document.getElementById("demo").innerHTML = xhr.responseText;
+                }
+            };
+
+            xhr.open('GET', 'http://bob.example.com/bob/response.json', true);
+            xhr.send();
+        }
+    </script>
+ <hr>
+ <p id="foot">
+  Last modified at: 
+ </p>
+ <script> 
+  let lastModified = new Date(document.lastModified);
+  document.getElementById("foot").innerHTML = lastModified;
+  </script>
+</body>
+
+
+</html>

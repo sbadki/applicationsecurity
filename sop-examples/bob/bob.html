@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="site.css">
+    </head>
+
+    <body>
+        <h1>Bob's Site</h1>
+
+        <p>Image:<img src="bob-dog.jpeg" height="300px" width="300px"/></p>
+        <p>Javascript: <script src="bob.js"></script></p>
+    
+        
+       <hr>
+       <p id="demo">
+        Last modified at: 
+       </p>
+       <script> 
+        let lastModified = new Date(document.lastModified);
+        document.getElementById("demo").innerHTML = lastModified;
+        </script>
+    </body>
+</html>

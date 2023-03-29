@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body>
+    <h1>Post data to another origin: bob.example.com</h1>
+
+    <form action="http://bob.example.com/bob/bob.html" method="POST">
+        <input name="email" type="text">
+        <input name="Go" type="submit">
+    </form>
+
+
+    <hr>
+       <p id="demo">
+        Last modified at: 
+       </p>
+       <script> 
+        let lastModified = new Date(document.lastModified);
+        document.getElementById("demo").innerHTML = lastModified;
+        </script>
+</body>
+
+</html>

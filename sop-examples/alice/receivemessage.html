@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>Receiving post message from parent </h1>
+
+        <h2 id="demo"></h2>
+
+        <script>
+            window.addEventListener('message', function(event) {
+                if(event.origin !== 'http://example.com') {
+                    console.log("Incorrect origin :" +event.origin);
+                    return;
+                }
+                window.demo.innerText = event.data;
+            }, false);
+        </script>
+
+        <hr>
+        <p id="foot">
+            Last modified at: 
+           </p>
+           <script> 
+            let lastModified = new Date(document.lastModified);
+            document.getElementById("foot").innerHTML = lastModified;
+            </script>
+    </body>
+</html>

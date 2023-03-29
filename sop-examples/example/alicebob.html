@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>Alice and Bob</title>
+    </head>
+        <frameset cols="50%,50%">
+            <frame name="framea" src="http://alice.example.com/alice/alice.html"/>
+            <frame name="frameb" src="http://bob.example.com/bob/bob.html"/>    
+        </frameset>
+
+        <hr id="demo">
+        <script>
+            var date = new Date(document.lastModified)
+            document.getElementById("demo").innerHTML = date;
+        </script>
+</html>

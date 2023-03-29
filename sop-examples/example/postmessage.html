@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+    <body>
+        <h1>postMessage demo</h1>
+
+        <p>
+            <button type="button" onclick="sendMessage()">Send message</button>
+        </p>
+
+        <iframe name="framea" src="http://alice.example.com/alice/receivemessage.html" style="width: 600px"></iframe>;
+
+        <script>
+            function sendMessage() {
+                var message = "Current time :" + (new Date().getTime());
+                window.framea.postMessage(message, "http://alice.example.com")
+            }
+        </script>
+    </body>
+</html>

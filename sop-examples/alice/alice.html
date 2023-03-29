@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="site.css">
+    </head>
+
+    <body>
+        <h1>Alice's Site</h1>
+
+        <p>Image:<img src="alice-cat.jpg" height="300px" width="300px"/></p>
+        <p id="sc1">Javascript: <script src="alice.js"></script></p>
+    
+      <!--  <p>Image referred from other origin bob.example.com :</br>
+	<img src="http://bob.example.com/bob/bob-dog.jpeg" height="300px" width="300px"/></p> -->
+
+       <!-- <script>
+        document.write("Site is at: " + document.location.href + ".");
+        </script> -->
+       <hr>
+       <p id="demo">
+        Last modified at: 
+       </p>
+       <script> 
+        let lastModified = new Date(document.lastModified);
+        document.getElementById("demo").innerHTML = lastModified;
+        </script>
+    </body>
+</html>

@@ -1,0 +1,311 @@
+---
+layout: post
+title:  "Oauth2"
+date:   2023-04-19 05:00:00 +0200 
+categories: Application security blogs
+---
+
+Oauth (Open Authorization), is a delegated authorization framework for REST/APIs which allows applications to access 
+user data without requesting user's credentials. 
+
+Any application allowing you to log in with third party app like Google, Facebook, Twitter or GitHub that means its using
+Oauth.
+
+## Background ##
+
+Before Oauth, user gives its credentials to third party applications to access users data. They do it by logging into your
+account using user id and password and access users data. This was very risky and bad approach. 
+
+For E.g. user wants the third party application like printing application to print your photos. User photos are stored in 
+Google Drive, and printing app doesn't have access to users photos. So printing service uses users google credentials 
+to access users photos from Google Drive and print it. This was very bad approach as user is completely trusting printing
+app with its Google credentials. Back then there was no other option, so security analysts has come up with Oauth 
+protocol where user doesn't need to give its credentials to third-party app.
+
+Oauth has two implementations Oauth1.0a and Oauth2.0. Both are completely different, and it's not backward compatible.
+In this blog post we talk about Oauth2.0.
+
+## Terminology used in Oauth2 ##
+
+Before diving deep into Oauth implementation we'll understand some terminology used with Oauth implementation. 
+
+**Resource Owner:** User who owns the data which client application wants to access. (You or me who owns social networking account).
+
+**Client Application:** The application who wants to use user's data. (Printing application)
+
+**Resource Server:** Who manages users data (Google Drive)
+
+**Authorization Server:** Who authorizes client to access users data by passing access tokens.(Googles Account management service)
+
+## OAuth 2.0 specification defines 4 types of authorization flows ##
+
+Oauth2.0 is implemented in 4 different ways depends on the type of application.
+
+**Authorization Code:** Used for server-side applications
+
+**Implicit:** Used for browser based applications like pure Javascript Single Page Applications(SPAs)
+
+**Client Credentials:** Machine-to-machine call, microservices and APIs
+
+**Resource Owner Password Credentials:** Used for desktop applications.
+
+## 1. Authorization Code Flow ##
+
+This grant type is used by the server side applications which doesn't expose its code to public. 
+
+1. User is provided with the login link on the web application.
+
+2. After clicking on login the user is redirected to the Oauth Authorization server, after which the Oauth login 
+   prompt is shown to the user.
+
+    Authorization Request contains:
+    - response_type: Client informs authorization server that it's using Authorization grant type by specifying response_type=code.
+    - client_id: This is the unique identifier given to client app when Client application registers itself with Oauth service.
+    - scope: Defines what information the client application can access. This will be the subset of users data.
+    - state: It's a unique unguessable value which is tied to user session on the client application. Oauth service should
+      send this value in response to ensures that the request to its /callback endpoint is from the same person who initiated the Oauth flow.
+    - redirect_uri: This is callback URI or callback endpoint. This is the URI to which the user browser should redirect the
+      authorization code to the client application
+
+3. User provide its credentials based on the Oauth login options its selects. User is requested to provide the consent 
+   to the Client application to access subset of users data. 
+
+4. After validating user credentials Authorization server provides Authorization code by redirecting User to the Client
+   application to its /callback endpoint, it's a one time authorization code.
+
+5. Client application request /token endpoint of Authorization server by passing Authorization code, Client ID and Client 
+   secret.
+
+6. Authorization server validates Authorization code and generate ID token, Access token, and an optional refresh token 
+   and send it back to Client application.
+
+7. Client Application sends Access token to Oauth Resource server to gain access to user data by calling its API endpoint 
+   /userinfo.
+
+8. Resource server responds with requested user data back to Client Application.
+
+
+![authorizationcode]({{ "/assets/images/oauth2/fig1-oauth-grant.png" | relative_url }})
+
+
+## 2. Implicit Flow ##
+
+Single page applications (SPAs), native desktop applications which doesn't have backend, those which are mostly browser 
+based applications uses Implicit grant type. 
+
+1. User is provided with the login link on the Client application.
+
+2. After clicking on login the user is redirected to the Oauth Authorization server, after which the Oauth login
+   prompt is shown to the user. The response_type=token would be pass in the request.
+
+3. User provide its credentials based on the Oauth login options its selects. User is requested to provide the consent
+   to the Client application to access subset of users data.
+
+4. After validating user credentials Authorization server directly provides ID token, Access token Client application.
+
+5. Client Application sends Access token to Oauth Resource server to gain access to user data by calling its API endpoint
+   /userinfo.
+
+6. Resource server responds with requested user data back to Client Application.
+
+
+![implicit]({{ "/assets/images/oauth2/fig2-implicit-grant.png" | relative_url }})
+
+
+## 3. Client Credentials Flow ##
+
+This type of grant is used for machine-to-machine flow where user is not involved. 
+
+1. The Client application pass client credentials like client_id and client secrete to Oauth Authorization server and 
+   makes call to token endpoint of Authorization server.
+
+2. Authorization server verifies client credentials and issues Access Token to the Client Application.
+
+3. Client Application present this Access token to Resource server to get Resource (user data).
+
+4. Resource server enquire about the access token with authorization server,once authorization server returns info about 
+   access token. Resource server validates the access token and returns requested resource to client.
+
+![clientcredentials]({{ "/assets/images/oauth2/fig3-clientcredential-grant.png" | relative_url }})
+
+
+## 4. Resource Owner Password Credentials Flow ##
+
+This type of grant is used when user completely trusts Client Application. 
+
+1. User is provided with the login form managed by the Client application. User provide its credentials to Client application.
+
+2. Client application stores user credentials with it and pass them to the Oauth Authorization server by calling token endpoint.
+
+3. Authorization server issues Access Token (and an Optional refresh token) to Client Application by validating passed credentials.
+
+4. Once Client application receives Access Token it presents the token to Resource Server and request user data.
+
+5. Resource server enquire about the Access token with Authorization server, after validating it Resource server returns user data.
+
+
+![password]({{ "/assets/images/oauth2/fig4-password-grant.png" | relative_url }})
+
+
+## How to choose grant type? ##
+
+### Does the Client Application maintains Client Secret? ###
+
+If the Client applications can't maintain the Client secret then we should use Implicit flow. Usually the Single Page 
+Applications(SPA) are browsed based application written using Javascript will expose Client secrets. Which is very risky 
+in nature. That's why we use Implicit flow with Form port. 
+
+Usually SPA can use one of the two grant type.
+- Implicit flow with form post
+- Authorization code flow with PKCE (this will go through in the future post)
+
+### Dose the Client application involves user? ###
+
+If the Client application doesn't involve user then we can use Client Credential flow. It's a machine to machine communication
+where front end is not involved. Here Client itself is a Resource owner
+
+### Does User trust Client Application to enter their password ###
+
+If User can trust Client application and provide its credentials like Username and Password to Client Application then 
+we can use Resource Owner Password Flow. Its necessary that Client should be completely trusted. Use this grant type only 
+if redirect flow (Authorization flow) is not possible.
+
+### Does the Client Application running on the server ###
+
+If the Client application is running on the server and User doesn't trust Client Application to provides user credentials 
+then we should use Authorization code flow. This is the suggested approach wherever possible rather than passing Access 
+token to the Users' browser which may lead to security concerns.
+
+## How to exploit Oauth2 vulnerabilities? ##
+
+We'll try to solve Portswigger labs for common attacks which occurs in case of Oauth implementation. The issue could be at 
+client side or could be at Authorization server side.
+
+### 1. Authentication bypass via Oauth Implicit flow ###
+
+1. Access the lab and login with credentials wiener:peter on Oauth login page.
+
+![lab]({{ "/assets/images/oauth2/lab1/fig5-lab1-implicit.png" | relative_url }})
+![oauthlogin]({{ "/assets/images/oauth2/lab1/fig6-lab1-login.png" | relative_url }})
+
+2.After successful login, Authorization server request consent from user for accessing Profile and Email.
+
+![loginreq]({{ "/assets/images/oauth2/lab1/fig7-lab1-login2.png" | relative_url }})
+![concent]({{ "/assets/images/oauth2/lab1/fig8-lab1-consent.png" | relative_url }})
+
+3.After validating users credentials Authorization server provides access token.
+
+![loginreq]({{ "/assets/images/oauth2/lab1/fig9-lab1-accesstoken.png" | relative_url }})
+
+4.After receiving access token Client is able to access user data.When we intercept the request we could see that username, 
+email and token is passed in the request.    
+
+![concent]({{ "/assets/images/oauth2/lab1/fig10-lab1-interceptloginreq.png" | relative_url }})
+
+5.Send the request to Burp repeater and try to change the user and email id and see what happens.
+
+![loginreq]({{ "/assets/images/oauth2/lab1/fig11-lab1-changecred.png" | relative_url }})
+
+6.Copy the response in the browser, and we could see that we are able to change the user credentials from wiener to carlos.
+
+![concent]({{ "/assets/images/oauth2/lab1/fig12-lab1-result.png" | relative_url }})
+   
+This happens because Client application is not checking whether the access token issued by Authorization server is linked
+to the user credentials in the request. 
+
+### 2. Flawed CSRF protection ###
+
+If client doesn't handle CSRF token linking properly on the client application then there are chances that attacker could perform
+CSRF attack. Will see in below lab how this is possible.
+
+1.Access the lab and login with given credentials wiener:peter.
+
+![fig1]({{ "/assets/images/oauth2/lab2/fig1-lab2.png" | relative_url }})
+
+2.In Burp Suite, we can see that csrf token is passed with username and password.
+
+![fig2]({{ "/assets/images/oauth2/lab2/fig2-lab2.png" | relative_url }})
+
+![fig3]({{ "/assets/images/oauth2/lab2/fig3-lab2.png" | relative_url }})
+
+3.After successful login, user is allowed to attach social profile to his account.
+
+![fig4]({{ "/assets/images/oauth2/lab2/fig4-lab2.png" | relative_url }})
+
+4.User enters his social account credentials and give the consent for accessing Profile and Email to Client Application.
+
+![fig5]({{ "/assets/images/oauth2/lab2/fig5-lab2.png" | relative_url }})
+
+![fig6]({{ "/assets/images/oauth2/lab2/fig6-lab2.png" | relative_url }})
+
+5.Social profile is attached to the account, after that clicks on Log out.
+
+![fig7]({{ "/assets/images/oauth2/lab2/fig7-lab2.png" | relative_url }})
+
+6.Click on Login with social media.
+
+![fig8]({{ "/assets/images/oauth2/lab2/fig8-lab2.png" | relative_url }})
+
+7.It will take user directly to his account without requesting for credentials again.
+
+![fig9]({{ "/assets/images/oauth2/lab2/fig9-lab2.png" | relative_url }})
+
+![fig10]({{ "/assets/images/oauth2/lab2/fig10-lab2.png" | relative_url }})
+
+8.Now, will intercept the "Attach social profile request" in Burp Suite and look for /oauth-linking request like shown below.
+
+![fig11]({{ "/assets/images/oauth2/lab2/fig11-lab2.png" | relative_url }})
+
+9.Copy that request and prepare an exploit in exploit server like below. Update the server to point to exploit server 
+and deliver exploit to victim.
+
+![fig12]({{ "/assets/images/oauth2/lab2/fig12-lab2.png" | relative_url }})
+
+10.Logout from the account and access the account by clicking on "Login with social media".
+
+11.We could see that user is able to see the admin page, where in he is able to delete carlos account
+
+![fig13]({{ "/assets/images/oauth2/lab2/fig13-lab2.png" | relative_url }})****
+
+12.Delete carlos and see the result.
+
+![fig14]({{ "/assets/images/oauth2/lab2/fig14-lab2.png" | relative_url }})
+
+
+## How to prevent Oauth2 attacks? ##
+
+1. When Authorization server sends access token to client application and use that access token for accessing resources, client
+application should verify whether the access token is associated to the same user who has requested. This can be done by
+verifying other request parameter with the access token in the request.
+
+2. To prevent CSRF attack the client application should send state param. This should be dynamically generated and unguessable
+value in the auth request to Authorization server. We can say it is same as CSRF token which would be tied to user's session.
+This will identify the authenticated user from the attacker as this value would be sent to and forth from client application
+to Authorization server for all communication happening between them.
+
+3. Authorization server sends Authorization code or access token to the redirect_uri specified in the authorization request by
+the client application based on the which grant type you use. If Auth server fails to validate this URI properly, an attacker
+may trick the browser to initiate an Oauth flow which will send code or token to an attacker controlled redirect_uri by 
+constructing a CSRF attack. Attacker can use this token or code to get access to the users account.
+
+   So auth server should strictly validate the redirect_uri pass by the client application in first auth request and to which it's 
+sending the token or code. It should point to same path otherwise do not send the token or code to modified path.
+
+4. Scope param in the request specifies what permission the user is giving to client application to access specific resource.
+If Auth server fails to validate scope properly it might allow attacker to upgrade an access token with extra permission.  
+
+
+## References: ##
+
+https://portswigger.net/web-security/
+
+
+
+
+
+
+
+
+
+
+

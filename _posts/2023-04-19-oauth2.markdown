@@ -88,6 +88,44 @@ This grant type is used by the server side applications which doesn't expose its
 ![authorizationcode]({{ "/assets/images/oauth2/fig1-oauth-grant.png" | relative_url }})
 
 
+### Authorization Code Flow with Proof Key for Code Exchange (PKCE) ###
+
+SPA (Single page applications) or Native applications can't store Client Secret secure in case of Oauth2 flow. SPA are
+javascript apps whose entire source is available to the browser. Similarly, Native apps code can be decompiled and reveal
+the client secret.
+
+So, to overcome this problem Oauth2 has come up with new RFC 7636, which is Authorization Code Flow with Proof Key for
+Code Exchange (PKCE).
+
+1. User is provided with the login link on the SPA application.
+
+2. Client application creates a code_verifier and generates code_challenge from it. It should be cryptographically
+   generated random number.
+
+3. User is redirected to the Oauth Authorization server, along with it sends code challenge after which the Oauth login
+   prompt is shown to the user.
+
+4. User provide its credentials and authenticates based on the Oauth login options its selects. User is requested to provide
+   the consent to the Client application to access subset of users data.
+
+5. Authorization server stores code_challenge and redirects user back to the application with Authorization code at /callback
+   endpoint, it's a one time use code.
+
+6. Client application sends Authorization code and code_verifier to the Auth server at /token endpoint.
+
+7. Authorization server validates code_challenge and code_verified
+
+8. Auth server responds with ID token, Access token, and an optional refresh token back to Client application.
+
+9. Client Application sends Access token to Oauth Resource server to gain access to user data by calling its
+   API endpoint /userinfo.
+
+10. Resource server responds with requested user data back to Client Application.
+
+
+![authorizationcode]({{ "/assets/images/oauth2/fig5-pkce.png" | relative_url }})
+
+
 ## 2. Implicit Flow ##
 
 Single page applications (SPAs), native desktop applications which doesn't have backend, those which are mostly browser 

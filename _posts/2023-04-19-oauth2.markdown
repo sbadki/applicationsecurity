@@ -58,14 +58,19 @@ This grant type is used by the server side applications which doesn't expose its
 2. After clicking on login the user is redirected to the Oauth Authorization server, after which the Oauth login 
    prompt is shown to the user.
 
-    Authorization Request contains:
-    - response_type: Client informs authorization server that it's using Authorization grant type by specifying response_type=code.
-    - client_id: This is the unique identifier given to client app when Client application registers itself with Oauth service.
-    - scope: Defines what information the client application can access. This will be the subset of users data.
-    - state: It's a unique unguessable value which is tied to user session on the client application. Oauth service should
-      send this value in response to ensures that the request to its /callback endpoint is from the same person who initiated the Oauth flow.
-    - redirect_uri: This is callback URI or callback endpoint. This is the URI to which the user browser should redirect the
-      authorization code to the client application
+      
+         Auth Request:         
+         GET /auth?client_id=s51ixxl76rjl9ljt7xy1i&redirect_uri=https://0a0f0016046a11698653407f00d500c6.web-security
+         -academy.net/oauth-linking&response_type=code&scope=openid%20profile%20email HTTP/1.1
+
+   - **client_id:** This is the unique identifier given to client app when Client application registers itself with Oauth service.
+   - **redirect_uri:** This is callback URI or callback endpoint. This is the URI to which the user browser should redirect the
+     authorization code to the client application
+   - **response_type:** Client informs authorization server that it's using Authorization grant type by specifying response_type=code.
+   - **scope:** Defines what information the client application can access. This will be the subset of users data.
+   - **state:** It's a unique unguessable value which is tied to user session on the client application. Oauth service should
+     send this value in response to ensures that the request to its /callback endpoint is from the same person who initiated the Oauth flow.
+
 
 3. User provide its credentials based on the Oauth login options its selects. User is requested to provide the consent 
    to the Client application to access subset of users data. 
@@ -73,8 +78,20 @@ This grant type is used by the server side applications which doesn't expose its
 4. After validating user credentials Authorization server provides Authorization code by redirecting User to the Client
    application to its /callback endpoint, it's a one time authorization code.
 
+      
+         Auth Response:   
+         HTTP/2 302 Found
+         ...
+         Redirecting to <a href="https://0a0f0016046a11698653407f00d500c6.web-security-academy.net/oauth-linking?
+         code=7ZA2-f7FZOvEK1lt0Ae_Cr2k-BGpmA2zHC9xcOx_z-0">
+
 5. Client application request /token endpoint of Authorization server by passing Authorization code, Client ID and Client 
    secret.
+
+      
+         Token Request:   
+         GET /oauth-linking?code=7ZA2-f7FZOvEK1lt0Ae_Cr2k-BGpmA2zHC9xcOx_z-0 HTTP/2
+         Host: 0a0f0016046a11698653407f00d500c6.web-security-academy.net
 
 6. Authorization server validates Authorization code and generate ID token, Access token, and an optional refresh token 
    and send it back to Client application.
@@ -95,17 +112,26 @@ javascript apps whose entire source is available to the browser. Similarly, Nati
 the client secret.
 
 So, to overcome this problem Oauth2 has come up with new RFC 7636, which is Authorization Code Flow with Proof Key for
-Code Exchange (PKCE).
+Code Exchange (PKCE). Will go through the steps below which takes place in case of this flow: 
 
 1. User is provided with the login link on the SPA application.
 
-2. Client application creates a code_verifier and generates code_challenge from it. It should be cryptographically
-   generated random number.
+2. Client application creates a code_verifier which is cryptographically generated random number and generates 
+   code_challenge from it.
+   code_verifier = string of 43-128 chars and remembers it as part of session.
+   code_challenge = SHA256(code_verifier)
 
-3. User is redirected to the Oauth Authorization server, along with it sends code challenge after which the Oauth login
-   prompt is shown to the user.
+3. User is redirected to the Oauth Authorization server, in Auth request it sends code challenge and code_challenge_method 
+   after which the Oauth login prompt is shown to the user.
 
-4. User provide its credentials and authenticates based on the Oauth login options its selects. User is requested to provide
+
+         Auth Request:
+         GET /auth?client_id=s51ixxl76rjl9ljt7xy1i&
+         redirect_uri=https://0a0f0016046a11698653407f00d500c6.web-security-academy.net
+         /oauth-linking&response_type=code&scope=openid%20profile%20email&
+         code_challenge=base64url(code_challenge)&code_challenge_method=S256 HTTP/1.1
+
+4. User provide its credentials and authenticates based on the Oauth login options it selects. User is requested to provide
    the consent to the Client application to access subset of users data.
 
 5. Authorization server stores code_challenge and redirects user back to the application with Authorization code at /callback
@@ -113,7 +139,14 @@ Code Exchange (PKCE).
 
 6. Client application sends Authorization code and code_verifier to the Auth server at /token endpoint.
 
-7. Authorization server validates code_challenge and code_verified
+
+         Token Request:
+         GET /oauth-linking?code=7ZA2-f7FZOvEK1lt0Ae_Cr2k-BGpmA2zHC9xcOx_z-0 HTTP/2
+         ;code_verifier=code_verifier
+      
+
+7. Authorization server create a hash of code_verifier based on code_challenge_method got it in Auth request and prepares 
+   hash from SHA256(code_verified) and validates it with code_challenge.
 
 8. Auth server responds with ID token, Access token, and an optional refresh token back to Client application.
 
@@ -135,14 +168,34 @@ based applications uses Implicit grant type.
 
 2. After clicking on login the user is redirected to the Oauth Authorization server, after which the Oauth login
    prompt is shown to the user. The response_type=token would be pass in the request.
+   
+      
+         Request: 
+         GET /auth?client_id=z8uvaqaf3uu6kfedyv5vo&redirect_uri=https://0ab700aa0368d7af8053672600b800e7
+         .web-security-academy.net/oauth-callback
+         &response_type=token&nonce=95623839&scope=openid%20profile%20email HTTP/2
 
 3. User provide its credentials based on the Oauth login options its selects. User is requested to provide the consent
    to the Client application to access subset of users data.
 
 4. After validating user credentials Authorization server directly provides ID token, Access token Client application.
 
+      
+         Response:
+         HTTP/2 302 Found
+         .....
+         Redirecting to <a href="https://0ab700aa0368d7af8053672600b800e7.web-security-academy.net
+         /oauth-callback#access_token=GmQok5oH5TmEn2BHkvSQMs6XGHA2TDd7RL5w6imZXNe&amp;expires_in=3600&amp;
+         token_type=Bearer&amp;scope=openid%20profile%20email">
+
 5. Client Application sends Access token to Oauth Resource server to gain access to user data by calling its API endpoint
-   /userinfo.
+   /userinfo (configured endpoint, following e.g. its /authenticate).
+  
+      
+         Request:
+         POST /authenticate HTTP/2
+         ....
+         {"email":"wiener@hotdog.com","username":"wiener","token":"GmQok5oH5TmEn2BHkvSQMs6XGHA2TDd7RL5w6imZXNe"}
 
 6. Resource server responds with requested user data back to Client Application.
 
@@ -179,7 +232,7 @@ This type of grant is used when user completely trusts Client Application.
 
 4. Once Client application receives Access Token it presents the token to Resource Server and request user data.
 
-5. Resource server enquire about the Access token with Authorization server, after validating it Resource server returns user data.
+5. Resource server validates it and returns user data.
 
 
 ![password]({{ "/assets/images/oauth2/fig4-password-grant.png" | relative_url }})
@@ -195,7 +248,7 @@ in nature. That's why we use Implicit flow with Form port.
 
 Usually SPA can use one of the two grant type.
 - Implicit flow with form post
-- Authorization code flow with PKCE (this will go through in the future post)
+- Authorization code flow with PKCE.
 
 ### Dose the Client application involves user? ###
 

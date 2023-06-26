@@ -5,7 +5,6 @@ date:   2023-03-01 09:00:00 +0800
 categories: Application security blogs
 ---
 
-## What is JSON Web Token? ##
 
 *JSON Web Token (JWT) is an open standard (RFC 7519) that defines a compact and self-contained way for securely transmitting information between parties 
 as a JSON object. This information can be verified and trusted because it is digitally signed. JWTs can be signed using a secret (with the HMAC algorithm)
@@ -133,11 +132,11 @@ access the resource.
 4. Modify the "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
 
 ![exploit1payload]({{ "/assets/images/jwt/fig4-exploit1payload.png" | relative_url }})
-5. Modify GET request to access /admin request and send
-6. By altering the payload we are able to access the admin portal.
+5.Modify GET request to access /admin request and send
+6.By altering the payload we are able to access the admin portal.
 
 ![exploit1result]({{ "/assets/images/jwt/fig5-exploit1result.png" | relative_url }})
-7. We can look for the /delete api and access that api to delete any user. 
+7.We can look for the /delete api and access that api to delete any user. 
 
 **Mitigation:** 
 Application must verify the signature of the token whether It's valid or not?
@@ -164,11 +163,11 @@ By altering the header with alg: none,  we are able to access the admin portal.
 keeping trailing dot (.) as is,
 
 ![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
-5. Modify GET request to access /admin request and send
-6. By modifying the algo we are able to access the admin portal.
+5.Modify GET request to access /admin request and send
+6.By modifying the algo we are able to access the admin portal.
 
 ![exploit2result]({{ "/assets/images/jwt/fig7-exploit2result.png" | relative_url }})
-7. We can look for the /delete api and access that api to delete any user. 
+7.We can look for the /delete api and access that api to delete any user. 
 
 
 **Mitigation:** 
@@ -202,13 +201,13 @@ secret using Hashcat utility.
 4. Brute force secret using HashCat utility. This will give the secret.
 
 ![exploit2result]({{ "/assets/images/jwt/fig8a-hashcatresult.png" | relative_url }})
-5. Create a symmetric key and sign it with the secret we got via bruteforce.
-6. Modify GET request to access /admin request. Update payload "sub" change to "administrator" and sign the token with the key created in above step.
+5.Create a symmetric key and sign it with the secret we got via bruteforce.
+6.Modify GET request to access /admin request. Update payload "sub" change to "administrator" and sign the token with the key created in above step.
 
 ![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
 
 ![exploit2result]({{ "/assets/images/jwt/fig7-exploit2result.png" | relative_url }})
-7. We can look for the /delete api and access that api to delete any user. 
+7.We can look for the /delete api and access that api to delete any user. 
 
 
 **Mitigation:** 

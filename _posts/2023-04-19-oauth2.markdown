@@ -43,7 +43,7 @@ Oauth2.0 is implemented in 4 different ways depends on the type of application.
 
 **Authorization Code:** Used for server-side applications
 
-**Implicit:** Used for browser based applications like pure Javascript Single Page Applications(SPAs)
+**Implicit:** Used for browser based applications like pure Javascript based Single Page Applications(SPAs)
 
 **Client Credentials:** Machine-to-machine call, microservices and APIs
 
@@ -118,8 +118,8 @@ Code Exchange (PKCE). Will go through the steps below which takes place in case 
 
 2. Client application creates a code_verifier which is cryptographically generated random number and generates 
    code_challenge from it.
-   code_verifier = string of 43-128 chars and remembers it as part of session.
-   code_challenge = SHA256(code_verifier)
+   code_verifier = Random string of 43-128 characters long and remembers it as part of session.
+   code_challenge = base64url(SHA256(code_verifier)
 
 3. User is redirected to the Oauth Authorization server, in Auth request it sends code challenge and code_challenge_method 
    after which the Oauth login prompt is shown to the user.
@@ -266,6 +266,23 @@ if redirect flow (Authorization flow) is not possible.
 If the Client application is running on the server and User doesn't trust Client Application to provides user credentials 
 then we should use Authorization code flow. This is the suggested approach wherever possible rather than passing Access 
 token to the Users' browser which may lead to security concerns.
+
+## Implementation ##
+
+Here is an example of Authorization grant type.
+
+1. Let user login with Oauth implementation of GitHub or Facebook
+![password]({{ "/assets/images/oauth2/fig6-githublogin.png" | relative_url }})
+
+2. When user choose to log in with GitHub, it directs user to the OAuth Authorization page which allows user to provide its credentials.
+![password]({{ "/assets/images/oauth2/fig6-login.png" | relative_url }})
+
+3. GitHub has enabled two-factor authentication, so it allows user to enter Verification code sent to his email id.
+![password]({{ "/assets/images/oauth2/fig7-2fa.png" | relative_url }})
+
+4. Once User enters verification code, he is able to see the message.
+![password]({{ "/assets/images/oauth2/fig8-success.png" | relative_url }})
+
 
 ## How to exploit Oauth2 vulnerabilities? ##
 

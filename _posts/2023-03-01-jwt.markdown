@@ -132,7 +132,9 @@ access the resource.
 4. Modify the "sub":"administrator" under the Inspector section in burp suit, and click on apply changes.
 
 ![exploit1payload]({{ "/assets/images/jwt/fig4-exploit1payload.png" | relative_url }})
+
 5.Modify GET request to access /admin request and send
+
 6.By altering the payload we are able to access the admin portal.
 
 ![exploit1result]({{ "/assets/images/jwt/fig5-exploit1result.png" | relative_url }})
@@ -159,11 +161,14 @@ By altering the header with alg: none,  we are able to access the admin portal.
     "kid":"89d3e87c-f161-420d-bf53-a7c990f52248",
     "alg": "RS256"
 }
+
 4. Modify the "alg":"none" under the Inspector section in burp suit, and click on apply changes. Strip off the signature section completely from the JWT 
 keeping trailing dot (.) as is,
 
 ![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
-5.Modify GET request to access /admin request and send
+
+5.Modify GET request to access /admin request and send.
+
 6.By modifying the algo we are able to access the admin portal.
 
 ![exploit2result]({{ "/assets/images/jwt/fig7-exploit2result.png" | relative_url }})
@@ -202,6 +207,7 @@ secret using Hashcat utility.
 
 ![exploit2result]({{ "/assets/images/jwt/fig8a-hashcatresult.png" | relative_url }})
 5.Create a symmetric key and sign it with the secret we got via bruteforce.
+
 6.Modify GET request to access /admin request. Update payload "sub" change to "administrator" and sign the token with the key created in above step.
 
 ![exploit2payload]({{ "/assets/images/jwt/fig6-exploit2payload.png" | relative_url }})
